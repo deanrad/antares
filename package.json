@@ -1,7 +1,7 @@
 {
   "name": "antares",
   "version": "0.0.1",
-  "description": "Turns a keyed object of Action Creators into a full async API for changing data The Redux Way™",
+  "description": "Turns a keyed object of Actions, Reducers, Epics, and Selectors into a full async API for changing data The Redux Way™",
   "main": "dist/antares.js",
   "scripts": {
     "test": "gulp",

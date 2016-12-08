@@ -1,6 +1,6 @@
 # antares
 
-Turns a keyed object of Action Creators into a full async API for changing data The Redux Way™
+Turns a keyed object of Actions, Reducers, Epics, and Selectors into a full async API for changing data The Redux Way™
 
 ![ES 2015](https://img.shields.io/badge/ES-2015-brightgreen.svg)
 [![Travis build status](http://img.shields.io/travis/deanius/antares.svg?style=flat)](https://travis-ci.org/deanius/antares)
