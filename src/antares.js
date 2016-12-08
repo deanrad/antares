@@ -1,1 +1,1 @@
-export default () => 'yo'
+export default () => ({ msg: 'yo'})
