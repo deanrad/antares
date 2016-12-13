@@ -30,3 +30,5 @@ tmp
 # Users Environment Variables
 .lock-wscript
 dist/
+
+.DS_Store

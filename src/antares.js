@@ -1,1 +1,1 @@
-export default () => ({ msg: 'yo'})
+export const antares = () => ({ msg: 'Hello Antares!'})

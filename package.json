@@ -1,5 +1,5 @@
 {
-  "name": "antares",
+  "name": "@deanius/antares",
   "version": "0.0.1",
   "description": "Turns a keyed object of Actions, Reducers, Epics, and Selectors into a full async API for changing data The Redux Way™",
   "main": "dist/antares.js",

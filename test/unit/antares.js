@@ -1,4 +1,4 @@
-import antares from '../../src/antares'
+import { antares } from '../../src/antares'
 
 describe('antares', () => {
   describe('Greet function', () => {
