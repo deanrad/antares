@@ -1,5 +1,5 @@
 {
-  "name": "@deanius/antares",
+  "name": "antares",
   "version": "0.0.1",
   "description": "Turns a keyed object of Actions, Reducers, Epics, and Selectors into a full async API for changing data The Redux Way™",
   "main": "dist/antares.js",
@@ -43,9 +43,12 @@
     "gulp-rename": "1.2.2",
     "gulp-sourcemaps": "2.x",
     "gulp-uglify": "2.0.0",
+    "immutable": "^3.8.1",
     "isparta": "4.0.0",
     "json-loader": "0.5.4",
     "mocha": "3.x",
+    "redux": "^3.6.0",
+    "redux-observable": "^0.13.0",
     "sinon": "^1.17.5",
     "sinon-chai": "^2.8.0",
     "webpack": "1.x",
@@ -58,5 +61,8 @@
   "dependencies": {
     "babel-core": "^6.18.2",
     "babel-loader": "^6.2.9"
+  },
+  "peerDependencies": {
+    "rxjs": "^5.0.1"
   }
 }
