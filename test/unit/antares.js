@@ -1,4 +1,4 @@
-import AntaresInit, { getConfig, getUserConfig } from '../../src/antares'
+import { AntaresInit, getConfig, getUserConfig } from '../../src/antares'
 import { assert } from 'chai'
 import defaultConfig from './factories'
 

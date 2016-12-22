@@ -9,3 +9,33 @@ Turns a keyed object of Actions, Reducers, Epics, and Selectors into a full asyn
 [![Dependency Status](https://david-dm.org/deanius/antares.svg)](https://david-dm.org/deanius/antares)
 [![devDependency Status](https://david-dm.org/deanius/antares/dev-status.svg)](https://david-dm.org/deanius/antares#info=devDependencies)
 ![twitter link](https://img.shields.io/badge/twitter-@deaniusaur-55acee.svg)
+
+
+# Installation
+```
+meteor npm install -S antares   # core functionality
+meteor add deanius:antares      #
+```
+
+# Usage (Meteor only)
+
+```
+import { AntaresMeteorInit } from 'meteor/deanius:antares'
+import { AntaresInit } from 'antares'
+
+export const { News } = AntaresMeteorInit(AntaresInit)({
+    Agencies,
+    News,
+    Types,
+    ActionCreators,
+    ReducerForAction,
+    Epics,
+    Selectors
+})
+
+News.dispatch(...)
+```
+
+# Developer Notes
+
+This is a hybrid npm package and Meteor Atmosphere package.

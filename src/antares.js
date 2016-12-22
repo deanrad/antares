@@ -8,13 +8,15 @@ const Config = {
 }
 
 // Allow the caller to initialize us, extending their config onto ours
-export default (config) => {
+export const AntaresInit = (config) => {
   Config.userProvided = config
 
-
+  console.info('Antares initialized.')
   return {
     News: {
-      originate: (actionCreator, params) => {}
+      originate: (actionCreator, params) => {
+        console.warn('TODO actually originate news.')
+      }
     }
   }
 }
