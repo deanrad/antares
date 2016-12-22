@@ -1,16 +1,32 @@
-import { antares } from '../../src/antares'
+import AntaresInit, { getConfig, getUserConfig } from '../../src/antares'
+import { assert } from 'chai'
+import defaultConfig from './factories'
 
 describe('antares', () => {
-  describe('Greet function', () => {
-    let result = antares()
+  let result = AntaresInit(defaultConfig)
 
-    it('should return yo', () => {
-      expect(result).to.have.property('msg', 'yo')
+  describe('default export', () => {
+    it('should be the initializer function', () => {
+      assert.isFunction(AntaresInit)
     })
 
-    it('should combine with rest-spread', () => {
-      expect({id: 123, ...result}).to.deep.eql({ msg: 'yo', id: 123 })
+    describe('return value', () => {
+      it('should have a News.originate function', () => {
+        expect(result).to.have.deep.property('News.originate')
+        assert.isFunction(result.News.originate)
+      })
     })
+  })
 
+  describe('.getUserConfig', () => {
+    it('should return the config given to the initializer', () => {
+      expect(getUserConfig()).to.equal(defaultConfig)
+    })
+  })
+
+  describe('.getConfig', () => {
+    it('should return an object with multiple keys', () => {
+      expect(getConfig()).to.contain.all.keys('userProvided', 'antaresDefault')
+    })
   })
 })
