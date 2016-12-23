@@ -115,7 +115,7 @@ const watchFiles = ['src/**/*', 'test/**/*', 'package.json', '**/.eslintrc'];
 
 // Run the headless unit tests as you make changes.
 function watch() {
-  gulp.watch(watchFiles, ['test']);
+  gulp.watch(watchFiles, ['build', 'test']);
 }
 
 function testBrowser() {
@@ -156,7 +156,7 @@ function testBrowser() {
     }, null, () => {
       if (firstBuild) {
         $.livereload.listen({port: 35729, host: 'localhost', start: true});
-        gulp.watch(watchFiles, ['lint']);
+        gulp.watch(watchFiles, ['build']);
       } else {
         $.livereload.reload('./tmp/__spec-build.js');
       }
