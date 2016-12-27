@@ -12,5 +12,5 @@ Package.onUse(function(api) {
     api.use('ecmascript')
     api.use('random')
 
-    api.mainModule('meteor/AntaresMeteorInit.js')
+    api.mainModule('meteor/AntaresMeteorInit.js', ['client', 'server'])
 })

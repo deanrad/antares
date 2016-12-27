@@ -11,22 +11,14 @@ describe('antares', () => {
     })
 
     describe('return value', () => {
-      it('should have a News.originate function', () => {
-        expect(result).to.have.deep.property('News.originate')
-        assert.isFunction(result.News.originate)
+      it('should have a Antares.originate function', () => {
+        expect(result).to.have.deep.property('Antares.originate')
+        assert.isFunction(result.Antares.originate)
       })
-    })
-  })
-
-  describe('.getUserConfig', () => {
-    it('should return the config given to the initializer', () => {
-      expect(getUserConfig()).to.equal(defaultConfig)
-    })
-  })
-
-  describe('.getConfig', () => {
-    it('should return an object with multiple keys', () => {
-      expect(getConfig()).to.contain.all.keys('userProvided', 'antaresDefault')
+      it('should have a Antares.dispatch function', () => {
+        expect(result).to.have.deep.property('Antares.dispatch')
+        assert.isFunction(result.Antares.dispatch)
+      })
     })
   })
 })
