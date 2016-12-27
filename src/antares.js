@@ -1,4 +1,4 @@
-import { Agents } from './config'
+import { Agents, ReducerForKey } from './config'
 import { initializeStore } from './store'
 export * from './agency'
 
@@ -6,6 +6,7 @@ export * from './agency'
 export const AntaresInit = (AntaresConfig) => {
   // Store provided config fields
   Object.assign(Agents, AntaresConfig.Agents)
+  ReducerForKey.push(AntaresConfig.ReducerForKey)
 
   const store = initializeStore()
 
@@ -28,8 +29,3 @@ export const AntaresInit = (AntaresConfig) => {
   console.info('Antares initialized.')
   return {Antares}
 }
-
-export class AntaresError extends Error {
-    constructor({type}) { super(type) }
-}
-

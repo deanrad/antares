@@ -22,8 +22,11 @@ export const defineDispatchProxy = () => {
 
 }
 
+const mergeReducer = (state, action) => state.merge(action.payload)
+const appendReducer = (state, action) => state.push(action.payload)
+
 // The default antares init function
-// Returns: an modified version of the initializer passed, passing it
+// Returns: an modified version of the initializer passed, extending its props with ours
 export const AntaresMeteorInit = (antaresInit) => {
     return (AntaresConfig) => {
         const meteorArgs = {
@@ -38,6 +41,8 @@ export const AntaresMeteorInit = (antaresInit) => {
           client: () => Meteor.isClient,
           any: () => true
         })
+
+        if (!AntaresConfig.ReducerForKey) AntaresConfig.ReducerForKey = (key) => appendReducer
 
         console.log('Initializing deanius:antares dispatch.')
         if (Meteor.isClient) defineDispatchProxy()

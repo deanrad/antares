@@ -1,9 +1,11 @@
 import { applyMiddleware, compose, createStore, combineReducers } from 'redux'
 import { createEpicMiddleware, combineEpics } from 'redux-observable'
 import { fromJS, Map as iMap } from 'immutable'
-import { Epics } from './config'
+import { Epics, ReducerForKey } from './config'
 import { inAgencyRun } from './agency'
+import { AntaresError } from './errors'
 
+// handles storing, updating, and removing
 export const antaresReducer = (state, action) => {
     if (!state) return new iMap()
 
@@ -11,19 +13,19 @@ export const antaresReducer = (state, action) => {
     console.log('AR>', { type })
 
     let { antares } = (meta || {})
-    let { createAtKey, key } = (antares || {})
+    let { key } = (antares || {})
 
-    // meta.antares.createAtKey - fail if record cant be stored using this key
-    if (createAtKey) {
-        if (state.has(createAtKey)) throw new AntaresError({type: 'createAtKey'})
-        return state.set(createAtKey, fromJS(payload))
+    // Fail if record cant be stored at this key
+    if (type === 'Antares.storeAtKey') {
+        if (state.has(key)) throw new AntaresError({type: 'storeAtKey'})
+        return state.set(key, fromJS(payload))
     }
 
-    // meta.antares.key - updates should be targeted to this key
-    if (key) {
-        if (! state.has(key)) throw new AntaresError({type: 'updateKey'})
+    // An antares or other update which should target a specific key
+    if (type === 'Antares.updateAtKey' || key) {
+        if (! state.has(key)) throw new AntaresError({type: 'updateAtKey'})
 
-        let reducer = ReducerFromKey(key)
+        let reducer = ReducerForKey[0](key)
         return state.update(key, state => reducer(state, action))
     }
 
