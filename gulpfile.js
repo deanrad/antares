@@ -113,9 +113,8 @@ function coverage(done) {
 
 const watchFiles = ['src/**/*', 'test/**/*', 'package.json', '**/.eslintrc'];
 
-// Run the headless unit tests as you make changes.
 function watch() {
-  gulp.watch(watchFiles, ['build', 'test']);
+  gulp.watch(watchFiles, ['build']);
 }
 
 function testBrowser() {
@@ -195,7 +194,6 @@ gulp.task('coverage', ['lint'], coverage);
 // Set up a livereload environment for our spec runner `test/runner.html`
 gulp.task('test-browser', ['lint', 'clean-tmp'], testBrowser);
 
-// Run the headless unit tests as you make changes.
 gulp.task('watch', watch);
 
 // An alias of test
