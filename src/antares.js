@@ -1,5 +1,6 @@
 import { Agents, ReducerForKey } from './config'
 import { initializeStore } from './store'
+import { inAgencyRun } from './agency'
 export * from './agency'
 
 // Allow the caller to initialize us, extending their config onto ours
@@ -10,6 +11,12 @@ export const AntaresInit = (AntaresConfig) => {
 
   const store = initializeStore()
 
+  const dispatchProxy = AntaresConfig.defineDispatchProxy(store)
+
+  inAgencyRun('server', () => {
+    AntaresConfig.defineDispatchEndpoint(store)
+  })
+
   const Antares = {
     originate: (actionCreator, params) => {
       console.warn('TODO actually originate news.')
@@ -17,7 +24,12 @@ export const AntaresInit = (AntaresConfig) => {
     },
     dispatch: (actionCreator, params) => {
       let action = Antares.originate(actionCreator, params)
-      console.warn('TODO actually dispatch news.')
+
+      // for all agents, reduce action into store
+      store.dispatch(action)
+
+      // for client agents (those with an upstream), invoke the proxy as well
+      dispatchProxy(action)
     },
     publish: () => {
 

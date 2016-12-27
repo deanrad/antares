@@ -11,15 +11,23 @@ export const newId = () => {
 //   and that is all.
 // The publication of the dispatched, and consequent actions is done by a final middleware
 // that runs after the epic middleware to ensure that every listener potentially can hear
-export const defineDispatchImpl = () => {
+export const defineDispatchEndpoint = (store) => {
   Meteor.methods({
-    'antares.dispatch': () => {}
+    'antares.dispatch': (action) => {
+      store.dispatch(action)
+      //console.log('TODO handle dispatch on server')
+    }
   })
 }
 
-// Defines the proxy (aka stub) which
-export const defineDispatchProxy = () => {
-
+// Defines the proxy (aka stub) which dispatches locally
+export const defineDispatchProxy = (action) => {
+  return new Promise((resolve, reject) => {
+    Meteor.call('antares.dispatch', action, (err, result) => {
+      if (err) return reject(err)
+      resolve(result)
+    })
+  })
 }
 
 const mergeReducer = (state, action) => state.merge(action.payload)
@@ -31,7 +39,9 @@ export const AntaresMeteorInit = (antaresInit) => {
     return (AntaresConfig) => {
         const meteorArgs = {
             antaresWrapper: 'meteor',
-            newId
+            newId,
+            defineDispatchEndpoint,
+            defineDispatchProxy
         }
 
         // Define default agency names 'any', 'server' and 'client' for familiarity within Meteor
@@ -43,10 +53,6 @@ export const AntaresMeteorInit = (antaresInit) => {
         })
 
         if (!AntaresConfig.ReducerForKey) AntaresConfig.ReducerForKey = (key) => appendReducer
-
-        console.log('Initializing deanius:antares dispatch.')
-        if (Meteor.isClient) defineDispatchProxy()
-        if (Meteor.isServer) defineDispatchImpl()
 
         console.log('Initializing deanius:antares meteor interface.')
         let antares = antaresInit({ ...AntaresConfig, ...meteorArgs })
