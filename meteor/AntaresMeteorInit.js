@@ -2,7 +2,7 @@ import { Meteor } from 'meteor/meteor'
 import { Random } from 'meteor/random'
 
 export const newId = () => {
-    return Random.id()
+  return Random.id()
 }
 
 // Defines the upstream (aka server) implementation of dispatch which:
@@ -36,26 +36,26 @@ const appendReducer = (state, action) => state.push(action.payload)
 // The default antares init function
 // Returns: an modified version of the initializer passed, extending its props with ours
 export const AntaresMeteorInit = (antaresInit) => {
-    return (AntaresConfig) => {
-        const meteorArgs = {
-            antaresWrapper: 'meteor',
-            newId,
-            defineDispatchEndpoint,
-            defineDispatchProxy
-        }
-
-        // Define default agency names 'any', 'server' and 'client' for familiarity within Meteor
-        if (!AntaresConfig.Agents) AntaresConfig.Agents = {}
-        Object.assign(AntaresConfig.Agents, {
-          server: () => Meteor.isServer,
-          client: () => Meteor.isClient,
-          any: () => true
-        })
-
-        if (!AntaresConfig.ReducerForKey) AntaresConfig.ReducerForKey = (key) => appendReducer
-
-        console.log('Initializing deanius:antares meteor interface.')
-        let antares = antaresInit({ ...AntaresConfig, ...meteorArgs })
-        return antares
+  return (AntaresConfig) => {
+    const meteorArgs = {
+      antaresWrapper: 'meteor',
+      newId,
+      defineDispatchEndpoint,
+      defineDispatchProxy
     }
+
+    // Define default agency names 'any', 'server' and 'client' for familiarity within Meteor
+    if (!AntaresConfig.Agents) AntaresConfig.Agents = {}
+    Object.assign(AntaresConfig.Agents, {
+      server: () => Meteor.isServer,
+      client: () => Meteor.isClient,
+      any: () => true
+    })
+
+    if (!AntaresConfig.ReducerForKey) AntaresConfig.ReducerForKey = (key) => appendReducer
+
+    console.log('Initializing deanius:antares meteor interface.')
+    let antares = antaresInit({ ...AntaresConfig, ...meteorArgs })
+    return antares
+  }
 }
