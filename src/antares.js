@@ -2,7 +2,8 @@ import { fromJS } from 'immutable'
 import { applyMiddleware, compose, createStore, combineReducers } from 'redux'
 import { createEpicMiddleware, combineEpics } from 'redux-observable'
 
-const Agents = {}
+import { Agents } from './config'
+export * from './agency'
 
 // Allow the caller to initialize us, extending their config onto ours
 export const AntaresInit = (AntaresConfig) => {
@@ -24,18 +25,6 @@ export const AntaresInit = (AntaresConfig) => {
 
   return {Antares}
 }
-
-export const isInAgency = (agencyType) => {
-    let runOnThisAgent = Agents[agencyType] || (() => false)
-    return runOnThisAgent()
-}
-
-export const inAgencyRun = (agencyType, fn) => {
-    isInAgency(agencyType) && fn.call(this)
-}
-
-export const getUserConfig = () => Config.userProvided
-export const getConfig = () => Config
 
 export class AntaresError extends Error {
     constructor({type}) { super(type) }
