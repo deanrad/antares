@@ -1,15 +1,13 @@
-import { fromJS } from 'immutable'
-import { applyMiddleware, compose, createStore, combineReducers } from 'redux'
-import { createEpicMiddleware, combineEpics } from 'redux-observable'
-
 import { Agents } from './config'
+import { initializeStore } from './store'
 export * from './agency'
 
 // Allow the caller to initialize us, extending their config onto ours
 export const AntaresInit = (AntaresConfig) => {
-  console.info('Antares initialized.')
-
+  // Store provided config fields
   Object.assign(Agents, AntaresConfig.Agents)
+
+  const store = initializeStore()
 
   const Antares = {
     originate: (actionCreator, params) => {
@@ -20,9 +18,14 @@ export const AntaresInit = (AntaresConfig) => {
       let action = Antares.originate(actionCreator, params)
       console.warn('TODO actually dispatch news.')
     },
+    publish: () => {
+
+    },
+    store,
     Config: { Agents }
   }
 
+  console.info('Antares initialized.')
   return {Antares}
 }
 
