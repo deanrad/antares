@@ -11,7 +11,7 @@ export const AntaresInit = (AntaresConfig) => {
 
   const store = initializeStore()
 
-  const dispatchProxy = AntaresConfig.defineDispatchProxy(store)
+  const dispatchProxy = AntaresConfig.defineDispatchProxy()
 
   inAgencyRun('server', () => {
     AntaresConfig.defineDispatchEndpoint(store)

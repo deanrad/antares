@@ -13,17 +13,15 @@ Turns a keyed object of Actions, Reducers, Epics, and Selectors into a full asyn
 
 # Installation
 ```
-meteor npm install -S antares   # core functionality
 meteor add deanius:antares      #
 ```
 
 # Usage (Meteor only)
 
 ```
-import { AntaresMeteorInit } from 'meteor/deanius:antares'
-import { AntaresInit } from 'antares'
+import { AntaresMeteorInit, AntaresInit } from 'meteor/deanius:antares'
 
-export const { News } = AntaresMeteorInit(AntaresInit)({
+export const Antares = AntaresMeteorInit(AntaresInit)({
     Agencies,
     News,
     Types,
@@ -33,7 +31,7 @@ export const { News } = AntaresMeteorInit(AntaresInit)({
     Selectors
 })
 
-News.dispatch(...)
+Antares.dispatch(...)
 ```
 
 # Developer Notes

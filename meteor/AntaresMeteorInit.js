@@ -1,6 +1,9 @@
 import { Meteor } from 'meteor/meteor'
 import { Random } from 'meteor/random'
 
+// allow consumers of the meteor package to skip having the npm dep as well
+export * from '../src/antares'
+
 export const newId = () => {
   return Random.id()
 }
@@ -14,6 +17,7 @@ export const newId = () => {
 export const defineDispatchEndpoint = (store) => {
   Meteor.methods({
     'antares.dispatch': (action) => {
+      console.log('AD>', action)
       store.dispatch(action)
       //console.log('TODO handle dispatch on server')
     }
@@ -21,7 +25,7 @@ export const defineDispatchEndpoint = (store) => {
 }
 
 // Defines the proxy (aka stub) which dispatches locally
-export const defineDispatchProxy = (action) => {
+export const defineDispatchProxy = () => (action) => {
   return new Promise((resolve, reject) => {
     Meteor.call('antares.dispatch', action, (err, result) => {
       if (err) return reject(err)
