@@ -5,6 +5,7 @@ import Rx from 'rxjs/Rx'
 import { Epics, ReducerForKey } from './config'
 import { inAgencyRun } from './agency'
 import { AntaresError } from './errors'
+import { enhanceActionMeta } from './action'
 
 // handles storing, updating, and removing
 export const antaresReducer = (state, action) => {
@@ -52,7 +53,13 @@ const makeStoreFromReducer = (reducer, ...middleware) => {
 }
 
 export const initializeStore = () => {
-  const rootEpic = combineEpics(...Object.values(Epics))
+  const userEpics = Object.values(Epics)
+  const antaresEnhancedEpics = userEpics.map(userEpic => {
+    return (action$, state) =>
+      userEpic(action$, state)
+        .map(enhanceActionMeta)
+  })
+  const rootEpic = combineEpics(...antaresEnhancedEpics)
   const epicMiddleware = createEpicMiddleware(rootEpic)
   const store = makeStoreFromReducer(rootReducer, epicMiddleware)
   console.log('Initialized Antares store')
