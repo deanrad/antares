@@ -17,9 +17,7 @@ export const newId = () => {
 export const defineDispatchEndpoint = (store) => {
   Meteor.methods({
     'antares.dispatch': (action) => {
-      console.log('AD>', action)
       store.dispatch(action)
-      //console.log('TODO handle dispatch on server')
     }
   })
 }
