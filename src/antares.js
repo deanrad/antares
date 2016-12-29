@@ -1,5 +1,5 @@
 import { fromJS, Map as iMap } from 'immutable'
-import { Agents, ReducerForKey, MetaEnhancers, Epics } from './config'
+import { Agents, ReducerForKey, MetaEnhancers, Epics, DispatchProxy } from './config'
 import { enhanceActionMeta } from './action'
 import { initializeStore } from './store'
 import { inAgencyRun } from './agency'
@@ -22,15 +22,25 @@ export const AntaresInit = (AntaresConfig) => {
   inAgencyRun('server', () => {
     AntaresConfig.defineDispatchEndpoint(store)
   })
+  inAgencyRun('client', () => {
+    DispatchProxy.push(dispatchProxy)
+  })
 
   const Antares = {
     announce: (actionCreator, payload) => {
       let action = actionCreator.call(null, payload)
       let enhancedAction = enhanceActionMeta(action)
+
+      // record in our store (throwing if invalid)
       store.dispatch(enhancedAction)
+
+      // send upstream
+      dispatchProxy(enhancedAction)
+
       return enhancedAction
     },
     store,
+    dispatchProxy,
     Config: { Agents }
   }
 

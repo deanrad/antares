@@ -26,6 +26,12 @@ export const defineDispatchEndpoint = (store) => {
 
 // Defines the proxy (aka stub) which dispatches locally
 export const defineDispatchProxy = () => (action) => {
+
+  // we dont dispatch localOnly actions over the wire
+  if (action.meta && action.meta && action.meta.antares && action.meta.antares.localOnly) {
+    return
+  }
+
   return new Promise((resolve, reject) => {
     Meteor.call('antares.dispatch', action, (err, result) => {
       if (err) return reject(err)
