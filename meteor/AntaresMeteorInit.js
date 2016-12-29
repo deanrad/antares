@@ -56,7 +56,7 @@ export const AntaresMeteorInit = (antaresInit) => {
       any: () => true
     })
 
-    if (!AntaresConfig.ReducerForKey) AntaresConfig.ReducerForKey = (key) => appendReducer
+    if (!AntaresConfig.ReducerForKey) AntaresConfig.ReducerForKey = (key) => mergeReducer
 
     console.log('Initializing deanius:antares meteor interface.')
     let antares = antaresInit({ ...AntaresConfig, ...meteorArgs })

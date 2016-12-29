@@ -3,6 +3,6 @@ export const Agents = {}
 export const Epics = {}
 export const ReducerForKey = []
 export const MetaEnhancers = [
-  () => ({ id: Math.floor(Math.random() * 1000) })
+  () => ({ actionId: Math.floor(Math.random() * 1000) })
 ]
 

@@ -17,13 +17,13 @@ export const antaresReducer = (state, action) => {
 
     // Fail if record cant be stored at this key
     if (type === 'Antares.storeAtKey') {
-        if (state.has(key)) throw new AntaresError({type: 'storeAtKey'})
+        if (state.has(key)) throw new AntaresError({ type: 'storeAtKey' })
         return state.set(key, fromJS(payload))
     }
 
     // An antares or other update which should target a specific key
     if (type === 'Antares.updateAtKey' || key) {
-        if (! state.has(key)) throw new AntaresError({type: 'updateAtKey'})
+        if (! state.has(key)) throw new AntaresError({ type: 'updateAtKey' })
 
         let reducer = ReducerForKey[0](key)
         return state.update(key, state => reducer(state, action))
