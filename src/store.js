@@ -10,7 +10,7 @@ export const antaresReducer = (state, action) => {
     if (!state) return new iMap()
 
     let { type, payload, meta } = action
-    console.log('AR>', { type })
+    console.log('AR>', action)
 
     let { antares } = (meta || {})
     let { key } = (antares || {})

@@ -1,13 +1,16 @@
-import { Agents, ReducerForKey } from './config'
+import { fromJS, Map as iMap } from 'immutable'
+import { Agents, ReducerForKey, MetaEnhancers } from './config'
 import { initializeStore } from './store'
 import { inAgencyRun } from './agency'
 export * from './agency'
 
 // Allow the caller to initialize us, extending their config onto ours
 export const AntaresInit = (AntaresConfig) => {
+
   // Store provided config fields
   Object.assign(Agents, AntaresConfig.Agents)
   ReducerForKey.push(AntaresConfig.ReducerForKey)
+  MetaEnhancers.push(...AntaresConfig.MetaEnhancers)
 
   const store = initializeStore()
 
@@ -18,10 +21,21 @@ export const AntaresInit = (AntaresConfig) => {
   })
 
   const Antares = {
-    announce: (actionCreator, payload, metaEnhancer) => {
-      let action = actionCreator.call(null, argObject)
+    announce: (actionCreator, payload) => {
+      let action = actionCreator.call(null, payload)
 
-      return action
+      let iAction = fromJS(action).updateIn(['meta', 'antares'], p => {
+        return p || new iMap()
+      })
+      // apply meta enhancers, making sure they dont mess with anything
+      let enhancedIAction = MetaEnhancers.reduce((iAction, enhancer) => {
+        let newMeta = enhancer(iAction)
+        return iAction.mergeIn(['meta', 'antares'], newMeta)
+      }, iAction)
+
+      let enhancedAction = enhancedIAction.toJS()
+      store.dispatch(enhancedAction)
+      return enhancedAction
     },
     store,
     Config: { Agents }
