@@ -18,21 +18,10 @@ export const AntaresInit = (AntaresConfig) => {
   })
 
   const Antares = {
-    originate: (actionCreator, params) => {
-      console.warn('TODO actually originate news.')
-      return { type: 'Antares.test' }
-    },
-    dispatch: (actionCreator, params) => {
-      let action = Antares.originate(actionCreator, params)
+    announce: (actionCreator, payload, metaEnhancer) => {
+      let action = actionCreator.call(null, argObject)
 
-      // for all agents, reduce action into store
-      store.dispatch(action)
-
-      // for client agents (those with an upstream), invoke the proxy as well
-      dispatchProxy(action)
-    },
-    publish: () => {
-
+      return action
     },
     store,
     Config: { Agents }
