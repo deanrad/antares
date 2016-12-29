@@ -1,6 +1,7 @@
 import { applyMiddleware, compose, createStore, combineReducers } from 'redux'
 import { createEpicMiddleware, combineEpics } from 'redux-observable'
 import { fromJS, Map as iMap } from 'immutable'
+import Rx from 'rxjs/Rx'
 import { Epics, ReducerForKey } from './config'
 import { inAgencyRun } from './agency'
 import { AntaresError } from './errors'
@@ -36,9 +37,6 @@ const rootReducer = combineReducers({
     antares: antaresReducer
 })
 
-const rootEpic = combineEpics(...Object.values(Epics))
-const epicMiddleware = createEpicMiddleware(rootEpic)
-
 // A utility function which incorporates Redux DevTools and optional middleware
 const makeStoreFromReducer = (reducer, ...middleware) => {
     let composeEnhancers = compose
@@ -54,6 +52,8 @@ const makeStoreFromReducer = (reducer, ...middleware) => {
 }
 
 export const initializeStore = () => {
+  const rootEpic = combineEpics(...Object.values(Epics))
+  const epicMiddleware = createEpicMiddleware(rootEpic)
   const store = makeStoreFromReducer(rootReducer, epicMiddleware)
   console.log('Initialized Antares store')
   return store
