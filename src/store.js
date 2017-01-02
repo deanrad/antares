@@ -19,7 +19,7 @@ export const antaresReducer = (state, action) => {
 
     // Fail if record cant be stored at this key
     if (type === 'Antares.storeAtKey') {
-        if (state.has(key)) throw new AntaresError(`Antares.storeAtKey: Store already has a value at ${key}`)
+        // if (state.has(key)) throw new AntaresError(`Antares.storeAtKey: Store already has a value at ${key}`)
         return state.set(key, fromJS(payload))
     }
 
