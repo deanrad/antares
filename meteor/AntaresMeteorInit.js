@@ -26,7 +26,6 @@ export const defineDispatchEndpoint = (store) => {
 
 // Defines the proxy (aka stub) which dispatches locally
 export const defineDispatchProxy = () => (action) => {
-
   // we dont dispatch localOnly actions over the wire
   if (action.meta && action.meta && action.meta.antares && action.meta.antares.localOnly) {
     return
@@ -59,7 +58,7 @@ const ddpMessageToAction = ({ id, fields, msg, collection }) => {
   }
 }
 
-// Returns a mapping of DDP events to Antares actions
+// Exposes client-side DDP events as Antares actions
 const defineRemoteActionsStream = () => {
   const action = new Rx.Subject
 
@@ -67,6 +66,7 @@ const defineRemoteActionsStream = () => {
     action.next(messageJSON)
   })
 
+  Meteor.subscribe('Antares.remoteActions')
   const action$ = action
     .map(JSON.parse)
     .filter(ddpMessageToSubType)
@@ -74,6 +74,17 @@ const defineRemoteActionsStream = () => {
     .asObservable()
 
   return action$
+}
+
+// Meteor.publish function
+const publishToEachClient = function() {
+  this.added('Antares.remoteActions', newId(), {TODO: 'publish real actions'})
+  this.ready()
+}
+
+// The remoteActionsProducer
+const defineRemoteActionsProducer = () => {
+  Meteor.publish('Antares.remoteActions', publishToEachClient)
 }
 
 const mergeReducer = (state, action) => state.merge(action.payload)
@@ -86,8 +97,9 @@ export const AntaresMeteorInit = (antaresInit) => {
     const meteorArgs = {
       antaresWrapper: 'meteor',
       newId,
-      defineDispatchEndpoint,
       defineDispatchProxy,
+      defineDispatchEndpoint,
+      defineRemoteActionsProducer,
       defineRemoteActionsStream
     }
 
