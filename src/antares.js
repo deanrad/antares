@@ -24,6 +24,7 @@ export const AntaresInit = (AntaresConfig) => {
   })
   inAgencyRun('client', () => {
     DispatchProxy.push(dispatchProxy)
+    AntaresConfig.defineRemoteActionsStream()
   })
 
   const Antares = {

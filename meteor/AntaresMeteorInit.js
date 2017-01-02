@@ -1,5 +1,6 @@
 import { Meteor } from 'meteor/meteor'
 import { Random } from 'meteor/random'
+import Rx from 'rxjs'
 
 // allow consumers of the meteor package to skip having the npm dep as well
 export * from '../src/antares'
@@ -15,6 +16,7 @@ export const newId = () => {
 // The publication of the dispatched, and consequent actions is done by a final middleware
 // that runs after the epic middleware to ensure that every listener potentially can hear
 export const defineDispatchEndpoint = (store) => {
+  // LEFTOFF put on the stream
   Meteor.methods({
     'antares.dispatch': (action) => {
       store.dispatch(action)
@@ -38,6 +40,42 @@ export const defineDispatchProxy = () => (action) => {
   })
 }
 
+const ddpMessageToSubType = ({ msg }) => {
+  if (msg === 'ping') return 'ping'
+  if (msg === 'added') return 'storeAtKey'
+  if (msg === 'changed') return 'updateAtKey'
+}
+
+//https://github.com/meteor/meteor/blob/devel/packages/ddp/DDP.md
+const ddpMessageToAction = ({ id, fields, msg, collection }) => {
+  let subtype = ddpMessageToSubType({ msg })
+
+  return {
+    type: `Antares.${subtype}`,
+    payload: fields,
+    meta: {
+      antares: { key: id }
+    }
+  }
+}
+
+// Returns a mapping of DDP events to Antares actions
+const defineRemoteActionsStream = () => {
+  const action = new Rx.Subject
+
+  Meteor.connection._stream.on('message', messageJSON => {
+    action.next(messageJSON)
+  })
+
+  const action$ = action
+    .map(JSON.parse)
+    .filter(ddpMessageToSubType)
+    .map(ddpMessageToAction)
+    .asObservable()
+
+  return action$
+}
+
 const mergeReducer = (state, action) => state.merge(action.payload)
 const appendReducer = (state, action) => state.push(action.payload)
 
@@ -49,7 +87,8 @@ export const AntaresMeteorInit = (antaresInit) => {
       antaresWrapper: 'meteor',
       newId,
       defineDispatchEndpoint,
-      defineDispatchProxy
+      defineDispatchProxy,
+      defineRemoteActionsStream
     }
 
     // Define default agency names 'any', 'server' and 'client' for familiarity within Meteor
