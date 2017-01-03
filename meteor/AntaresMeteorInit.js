@@ -9,6 +9,8 @@ export const newId = () => {
   return Random.id()
 }
 
+const remoteActions = new Rx.Subject
+
 // Defines the upstream (aka server) implementation of dispatch which:
 //   dispatches to local store
 //   acks the client
@@ -16,10 +18,10 @@ export const newId = () => {
 // The publication of the dispatched, and consequent actions is done by a final middleware
 // that runs after the epic middleware to ensure that every listener potentially can hear
 export const defineDispatchEndpoint = (store) => {
-  // LEFTOFF put on the stream
   Meteor.methods({
     'antares.dispatch': (action) => {
       store.dispatch(action)
+      remoteActions.next(action)
     }
   })
 }
@@ -39,27 +41,8 @@ export const defineDispatchProxy = () => (action) => {
   })
 }
 
-const ddpMessageToSubType = ({ msg }) => {
-  if (msg === 'ping') return 'ping'
-  if (msg === 'added') return 'storeAtKey'
-  if (msg === 'changed') return 'updateAtKey'
-}
-
-//https://github.com/meteor/meteor/blob/devel/packages/ddp/DDP.md
-const ddpMessageToAction = ({ id, fields, msg, collection }) => {
-  let subtype = ddpMessageToSubType({ msg })
-
-  return {
-    type: `Antares.${subtype}`,
-    payload: fields,
-    meta: {
-      antares: { key: id }
-    }
-  }
-}
-
 // Exposes client-side DDP events as Antares actions
-const defineRemoteActionsStream = () => {
+const defineRemoteActionsConsumer = () => {
   const action = new Rx.Subject
 
   Meteor.connection._stream.on('message', messageJSON => {
@@ -69,8 +52,9 @@ const defineRemoteActionsStream = () => {
   Meteor.subscribe('Antares.remoteActions')
   const action$ = action
     .map(JSON.parse)
-    .filter(ddpMessageToSubType)
-    .map(ddpMessageToAction)
+//    .filter(ddpMessageToSubType)
+    .filter(msg => msg.collection === 'Antares.remoteActions')
+    .map(msg => msg.fields)
     .asObservable()
 
   return action$
@@ -78,8 +62,14 @@ const defineRemoteActionsStream = () => {
 
 // Meteor.publish function
 const publishToEachClient = function() {
-  this.added('Antares.remoteActions', newId(), {TODO: 'publish real actions'})
-  this.ready()
+  let client = this
+  // TODO don't dispatch originator's action
+  // this.added('Antares.remoteActions', newId(), {TODO: 'publish real actions'})
+  remoteActions.subscribe(action => {
+    client.added('Antares.remoteActions', newId(), action)
+  })
+
+  client.ready()
 }
 
 // The remoteActionsProducer
@@ -100,7 +90,7 @@ export const AntaresMeteorInit = (antaresInit) => {
       defineDispatchProxy,
       defineDispatchEndpoint,
       defineRemoteActionsProducer,
-      defineRemoteActionsStream
+      defineRemoteActionsConsumer
     }
 
     // Define default agency names 'any', 'server' and 'client' for familiarity within Meteor
