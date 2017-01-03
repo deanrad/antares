@@ -19,7 +19,9 @@ const remoteActions = new Rx.Subject
 // that runs after the epic middleware to ensure that every listener potentially can hear
 export const defineDispatchEndpoint = (store) => {
   Meteor.methods({
-    'antares.dispatch': (action) => {
+    'antares.dispatch': function (action) {
+      let client = this
+      action.meta.antares.connectionId = client.connection.id
       store.dispatch(action)
       remoteActions.next(action)
     }
@@ -52,7 +54,6 @@ const defineRemoteActionsConsumer = () => {
   Meteor.subscribe('Antares.remoteActions')
   const action$ = action
     .map(JSON.parse)
-//    .filter(ddpMessageToSubType)
     .filter(msg => msg.collection === 'Antares.remoteActions')
     .map(msg => msg.fields)
     .asObservable()
@@ -63,11 +64,13 @@ const defineRemoteActionsConsumer = () => {
 // Meteor.publish function
 const publishToEachClient = function() {
   let client = this
-  // TODO don't dispatch originator's action
-  // this.added('Antares.remoteActions', newId(), {TODO: 'publish real actions'})
-  remoteActions.subscribe(action => {
-    client.added('Antares.remoteActions', newId(), action)
-  })
+
+  remoteActions
+    // the originating connection already has the action - dont publish back to it
+    .filter(action => action.meta.antares.connectionId != client.connection.id)
+    .subscribe(action => {
+      client.added('Antares.remoteActions', newId(), action)
+    })
 
   client.ready()
 }
