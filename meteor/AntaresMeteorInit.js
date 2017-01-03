@@ -23,6 +23,7 @@ export const defineDispatchEndpoint = (store) => {
       let client = this
       action.meta.antares.connectionId = client.connection.id
       store.dispatch(action)
+      // publishes dispatched actions, not epic-created ones (yet)
       remoteActions.next(action)
     }
   })
@@ -31,7 +32,7 @@ export const defineDispatchEndpoint = (store) => {
 // Defines the proxy (aka stub) which dispatches locally
 export const defineDispatchProxy = () => (action) => {
   // we dont dispatch localOnly actions over the wire
-  if (action.meta && action.meta && action.meta.antares && action.meta.antares.localOnly) {
+  if (action.meta && action.meta.antares && action.meta.antares.localOnly) {
     return
   }
 
@@ -61,13 +62,14 @@ const defineRemoteActionsConsumer = () => {
   return action$
 }
 
-// Meteor.publish function
 const publishToEachClient = function() {
   let client = this
 
   remoteActions
     // the originating connection already has the action - dont publish back to it
     .filter(action => action.meta.antares.connectionId != client.connection.id)
+    // this is a consequential action marked localOnly
+    .filter(action => !(action.meta.antares.localOnly))
     .subscribe(action => {
       client.added('Antares.remoteActions', newId(), action)
     })
