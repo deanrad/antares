@@ -62,8 +62,24 @@ const defineRemoteActionsConsumer = () => {
   return action$
 }
 
-const publishToEachClient = function() {
+const createPublisher = (store) => function(/* TODO subscription params */) {
+  try {
   let client = this
+
+  console.log('  --------------  ')
+  console.log(`AP> got subscriber ${client.connection.id}`)
+  client.onStop(() => console.log(`PUB> ddp subscriber ${client.connection.id} signed off`))
+
+  // LEFTOFF catching up newly connected clients with a store
+  const initAction = {
+    type: 'Antares.init',
+    payload: {
+      antares: store.getState().antares.toJS()
+    }
+  }
+
+
+  client.added('Antares.remoteActions', newId(), initAction)
 
   remoteActions
     // the originating connection already has the action - dont publish back to it
@@ -71,15 +87,20 @@ const publishToEachClient = function() {
     // this is a consequential action marked localOnly
     .filter(action => !(action.meta.antares.localOnly))
     .subscribe(action => {
+      console.log('AP> ' + action.type)
       client.added('Antares.remoteActions', newId(), action)
     })
 
   client.ready()
+  } catch (ex) {
+    console.error('AP> ERROR: ', ex)
+  }
 }
 
 // The remoteActionsProducer
-const defineRemoteActionsProducer = () => {
-  Meteor.publish('Antares.remoteActions', publishToEachClient)
+const defineRemoteActionsProducer = (store) => {
+  const publisher = createPublisher(store)
+  Meteor.publish('Antares.remoteActions', publisher)
 }
 
 const mergeReducer = (state, action) => state.merge(action.payload)

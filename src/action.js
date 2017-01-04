@@ -15,11 +15,11 @@ export const enhanceActionMeta = (action) => {
     return enhancedIAction.toJS()
 }
 
-export const createConsequence = (consequence) => {
+export const createConsequence = (parent, consequence) => {
   let { type, payload, meta } = consequence
   let antaresMeta = (meta || {}).antares
 
-  return (parent) => ({
+  return {
     type,
     payload,
     meta: {
@@ -29,7 +29,7 @@ export const createConsequence = (consequence) => {
         parentActionId: parent.meta.antares.actionId
       }
     }
-  })
+  }
 }
 
 

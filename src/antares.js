@@ -24,7 +24,7 @@ export const AntaresInit = (AntaresConfig) => {
 
   inAgencyRun('server', () => {
     AntaresConfig.defineDispatchEndpoint(store)
-    AntaresConfig.defineRemoteActionsProducer()
+    AntaresConfig.defineRemoteActionsProducer(store)
   })
 
   // Ensure we're listening for remoteActions and applying them to our store
