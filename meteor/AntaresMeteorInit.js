@@ -70,14 +70,10 @@ const createPublisher = (store) => function(/* TODO subscription params */) {
   console.log(`AP> got subscriber ${client.connection.id}`)
   client.onStop(() => console.log(`PUB> ddp subscriber ${client.connection.id} signed off`))
 
-  // LEFTOFF catching up newly connected clients with a store
   const initAction = {
     type: 'Antares.init',
-    payload: {
-      antares: store.getState().antares.toJS()
-    }
+    payload: store.getState().antares.toJS()
   }
-
 
   client.added('Antares.remoteActions', newId(), initAction)
 

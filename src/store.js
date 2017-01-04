@@ -31,6 +31,10 @@ export const antaresReducer = (state, action) => {
         return state.update(key, state => reducer(state, action))
     }
 
+    if (type === 'Antares.init') {
+      return fromJS(action.payload)
+    }
+
     return state
 }
 
