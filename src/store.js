@@ -12,23 +12,24 @@ export const antaresReducer = (state, action) => {
     if (!state) return new iMap()
 
     let { type, payload, meta } = action
-    console.log('AR>', action)
+    inAgencyRun('server', () => console.log('AR>', action))
 
     let { antares } = (meta || {})
     let { key } = (antares || {})
+    let keyPath = [].concat(key)
 
     // Fail if record cant be stored at this key
     if (type === 'Antares.storeAtKey') {
         // if (state.has(key)) throw new AntaresError(`Antares.storeAtKey: Store already has a value at ${key}`)
-        return state.set(key, fromJS(payload))
+        return state.setIn(keyPath, fromJS(payload))
     }
 
     // An antares or other update which should target a specific key
     if (type === 'Antares.updateAtKey' || key) {
-        if (! state.has(key)) throw new AntaresError(`Antares.updateAtKey: Store has no value at ${key}`)
+        if (! state.hasIn(keyPath)) throw new AntaresError(`Antares.updateAtKey: Store has no value at ${key}`)
 
         let reducer = ReducerForKey[0](key)
-        return state.update(key, state => reducer(state, action))
+        return state.updateIn(keyPath, state => reducer(state, action))
     }
 
     if (type === 'Antares.init') {
