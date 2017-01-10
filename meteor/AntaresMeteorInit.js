@@ -99,6 +99,7 @@ const defineRemoteActionsProducer = (store) => {
   Meteor.publish('Antares.remoteActions', publisher)
 }
 
+const noopReducer = (state, action) => state
 const mergeReducer = (state, action) => state.merge(action.payload)
 const appendReducer = (state, action) => state.push(action.payload)
 
@@ -123,7 +124,13 @@ export const AntaresMeteorInit = (antaresInit) => {
       any: () => true
     })
 
-    if (!AntaresConfig.ReducerForKey) AntaresConfig.ReducerForKey = (key) => mergeReducer
+    if (!AntaresConfig.ReducerForKey) {
+      AntaresConfig.ReducerForKey = (key) => noopReducer
+    }
+    
+    if (!AntaresConfig.MetaEnhancers) {
+      AntaresConfig.MetaEnhancers = []
+    }
 
     console.log('Initializing deanius:antares meteor interface.')
     let antares = antaresInit({ ...AntaresConfig, ...meteorArgs })
