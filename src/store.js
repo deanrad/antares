@@ -2,7 +2,7 @@ import { applyMiddleware, compose, createStore, combineReducers } from 'redux'
 import { createEpicMiddleware, combineEpics } from 'redux-observable'
 import { fromJS, Map as iMap } from 'immutable'
 import Rx from 'rxjs/Rx'
-import { Epics, ReducerForKey, DispatchProxy } from './config'
+import { Epics, ReducerForKey, ViewReducer, DispatchProxy } from './config'
 import { inAgencyRun, isInAgency } from './agency'
 import { AntaresError } from './errors'
 import { enhanceActionMeta } from './action'
@@ -39,10 +39,6 @@ export const antaresReducer = (state, action) => {
     return state
 }
 
-const rootReducer = combineReducers({
-    antares: antaresReducer
-})
-
 // A utility function which incorporates Redux DevTools and optional middleware
 const makeStoreFromReducer = (reducer, ...middleware) => {
     let composeEnhancers = compose
@@ -58,7 +54,7 @@ const makeStoreFromReducer = (reducer, ...middleware) => {
     ))
 }
 
-const onClientSendToServer = (action) => {
+const dispatchToServer = (action) => {
   if( isInAgency('client') ) {
     let dispatchProxy = DispatchProxy[0]
     dispatchProxy.call(null, action)
@@ -73,10 +69,18 @@ export const initializeStore = () => {
     return (action$, state) =>
       userEpic(action$, state)
         .map(enhanceActionMeta)
-        .do(onClientSendToServer)
+        .do(dispatchToServer)
   })
+
   const rootEpic = combineEpics(...antaresEnhancedEpics)
   const epicMiddleware = createEpicMiddleware(rootEpic)
+
+  const viewReducer = ViewReducer[0]
+  const rootReducer = combineReducers({
+      antares: antaresReducer,
+      view: viewReducer
+  })
+  
   const store = makeStoreFromReducer(rootReducer, epicMiddleware)
   console.log('Initialized Antares store')
   return store

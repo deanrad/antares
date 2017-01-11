@@ -1,6 +1,6 @@
 {
   "name": "antares",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Turns a keyed object of Actions, Reducers, Epics, and Selectors into a full async API for changing data The Redux Way™",
   "main": "dist/antares.js",
   "scripts": {
@@ -16,7 +16,7 @@
     "url": "https://github.com/deanius/antares.git"
   },
   "keywords": [],
-  "author": "Dean Radcliffe <deanmisc@yahoo.com>",
+  "author": "Dean Radcliffe <dean+antares@deanius.com>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/deanius/antares/issues"
