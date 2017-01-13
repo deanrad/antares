@@ -19,8 +19,10 @@ const remoteActions = new Rx.Subject
 // that runs after the epic middleware to ensure that every listener potentially can hear
 export const defineDispatchEndpoint = (store) => {
   Meteor.methods({
-    'antares.dispatch': function (action) {
+    'antares.dispatch': function (intent) {
       let client = this
+      let action = intent
+      
       action.meta.antares.connectionId = client.connection.id
       
       // simulate delay to test optimistic UI
