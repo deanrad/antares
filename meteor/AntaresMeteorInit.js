@@ -22,15 +22,18 @@ export const defineDispatchEndpoint = (store) => {
     'antares.dispatch': function (intent) {
       let client = this
       let action = intent
-      
+
+      // record the connection this came in on (a default MetaEnhancer)
       action.meta.antares.connectionId = client.connection.id
       
       // simulate delay to test optimistic UI
       Promise.await(new Promise(resolve => setTimeout(resolve, 250)))
 
+      // Dispatching to the store may throw exception
       console.log(`AD (${action.meta.antares.actionId})> ${action.type} `, action)
       store.dispatch(action)
-      // publishes dispatched actions, not epic-created ones (yet)
+
+      // Add intent to the remoteActions(allClientsIntents) stream for subscribers
       console.log(`AP (${action.meta.antares.actionId})> Sending ${action.type} upstream`)
       remoteActions.next(action)
     }
