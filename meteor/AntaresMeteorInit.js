@@ -31,13 +31,17 @@ export const defineDispatchEndpoint = (store) => {
   })
 }
 
-// Defines the proxy (aka stub) which dispatches locally
+// The function returned here will be the one which Antares.announce invokes
+// on the client in order to send the message on the wire to the server.
+// NOTE: It is assumed at this point that reduction into the local store has been done already.
 export const defineDispatchProxy = () => (action) => {
-  // we dont dispatch localOnly actions over the wire
+  // we withhold localOnly actions from the wire
+  // TODO move this to a base, not Meteor-specific 
   if (action.meta && action.meta.antares && action.meta.antares.localOnly) {
     return
   }
 
+  // and return a Promise-wrapped DDP Meteor call
   return new Promise((resolve, reject) => {
     Meteor.call('antares.dispatch', action, (err, result) => {
       if (err) return reject(err)
