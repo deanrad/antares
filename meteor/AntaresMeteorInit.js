@@ -22,8 +22,10 @@ export const defineDispatchEndpoint = (store) => {
     'antares.dispatch': function (action) {
       let client = this
       action.meta.antares.connectionId = client.connection.id
+      console.log(`AD (${action.meta.antares.actionId})> ${action.type} `, action)
       store.dispatch(action)
       // publishes dispatched actions, not epic-created ones (yet)
+      console.log(`AP (${action.meta.antares.actionId})> Sending ${action.type} upstream`)
       remoteActions.next(action)
     }
   })
@@ -83,7 +85,6 @@ const createPublisher = (store) => function(/* TODO subscription params */) {
     // this is a consequential action marked localOnly
     .filter(action => !(action.meta.antares.localOnly))
     .subscribe(action => {
-      console.log('AP> ' + action.type)
       client.added('Antares.remoteActions', newId(), action)
     })
 
