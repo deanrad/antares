@@ -5,6 +5,6 @@ export const Epics = {}
 export const ReducerForKey = []
 export const ViewReducer = []
 export const MetaEnhancers = [
-  () => ({ actionId: Math.floor(Math.random() * 1000) })
+  () => ({ actionId: Math.floor(Math.random() * 10000) })
 ]
 export const DispatchProxy = []
