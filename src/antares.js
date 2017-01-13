@@ -18,7 +18,15 @@ export const AntaresInit = (AntaresConfig) => {
 
   const store = initializeStore()
 
-  const dispatchProxy = AntaresConfig.defineDispatchProxy()
+  const userDispatchProxy = AntaresConfig.defineDispatchProxy()
+  const dispatchProxy = action => {
+    // Withhold localOnly actions from the wire
+    if (action.meta && action.meta.antares && action.meta.antares.localOnly) {
+      return
+    }
+    return userDispatchProxy(action)
+  }
+
   inAgencyRun('client', () => {
     DispatchProxy.push(dispatchProxy)
   })
