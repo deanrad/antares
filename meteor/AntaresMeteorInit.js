@@ -22,6 +22,10 @@ export const defineDispatchEndpoint = (store) => {
     'antares.dispatch': function (action) {
       let client = this
       action.meta.antares.connectionId = client.connection.id
+      
+      // simulate delay to test optimistic UI
+      Promise.await(new Promise(resolve => setTimeout(resolve, 250)))
+
       console.log(`AD (${action.meta.antares.actionId})> ${action.type} `, action)
       store.dispatch(action)
       // publishes dispatched actions, not epic-created ones (yet)
