@@ -50,10 +50,8 @@ export const AntaresInit = (AntaresConfig) => {
       // record in our store (throwing if invalid)
       store.dispatch(enhancedAction)
 
-      // send upstream
-      dispatchProxy(enhancedAction)
-
-      return enhancedAction
+      // send upstream, returning a promise for server acknowledgement
+      return dispatchProxy(enhancedAction)
     },
     store,
     dispatchProxy,
