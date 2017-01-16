@@ -61,5 +61,5 @@ export const AntaresInit = (AntaresConfig) => {
   }
 
   console.info('Antares initialized.')
-  return {Antares}
+  return Antares
 }
