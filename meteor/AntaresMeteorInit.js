@@ -1,6 +1,7 @@
 import { Meteor } from 'meteor/meteor'
 import { Random } from 'meteor/random'
 import Rx from 'rxjs'
+import { Map as iMap } from 'immutable'
 
 // allow consumers of the meteor package to skip having the npm dep as well
 export * from '../src/antares'
@@ -110,6 +111,7 @@ const defineRemoteActionsProducer = (store) => {
 const noopReducer = (state = {}, action) => state
 const mergeReducer = (state, action) => state.merge(action.payload)
 const appendReducer = (state, action) => state.push(action.payload)
+const noopiMapReducer = (state = new iMap(), action ) => state
 
 // The default antares init function
 // Returns: an modified version of the initializer passed, extending its props with ours
@@ -141,7 +143,7 @@ export const AntaresMeteorInit = (antaresInit) => {
     }
 
     if (!AntaresConfig.ViewReducer) {
-      AntaresConfig.ViewReducer = noopReducer
+      AntaresConfig.ViewReducer = noopiMapReducer
     }
 
     console.log('Initializing deanius:antares meteor interface.')
