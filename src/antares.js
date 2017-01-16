@@ -43,8 +43,13 @@ export const AntaresInit = (AntaresConfig) => {
   })
 
   const Antares = {
-    announce: (actionCreator, payload) => {
-      let action = actionCreator.call(null, payload)
+    announce: (actionCreatorOrType, payload) => {
+      let action
+      if (actionCreatorOrType.call) {
+        action = actionCreatorOrType.call(null, payload)
+      } else {
+        action = {type: actionCreatorOrType, payload}
+      }
       let enhancedAction = enhanceActionMeta(action)
 
       // record in our store (throwing if invalid)
