@@ -70,6 +70,7 @@ const defineRemoteActionsConsumer = () => {
     action.next(messageJSON)
   })
 
+  // TODO 7 - Allow limiting of this publication a) at startup b) at-will
   Meteor.subscribe('Antares.remoteActions')
   const action$ = action
     .map(JSON.parse)
@@ -80,35 +81,38 @@ const defineRemoteActionsConsumer = () => {
   return action$
 }
 
-const createPublisher = (store) => function(/* TODO subscription params */) {
-  try {
-  let client = this
+// Close over a store, returning a Meteor.publish function over that store
+const createPublisher = (store) =>
+  function(/* TODO 7 Allow limiting of publication */) {
+    try {
+      let client = this
 
-  console.log('  --------------  ')
-  console.log(`AP> got subscriber ${client.connection.id}`)
-  client.onStop(() => console.log(`PUB> ddp subscriber ${client.connection.id} signed off`))
+      console.log('  --------------  ')
+      console.log(`AP> got subscriber ${client.connection.id}`)
+      client.onStop(() => console.log(`PUB> ddp subscriber ${client.connection.id} signed off`))
 
-  const initAction = {
-    type: 'Antares.init',
-    payload: store.getState().antares.toJS()
+      const initAction = {
+        type: 'Antares.init',
+        payload: store.getState().antares.toJS()
+      }
+
+      client.added('Antares.remoteActions', newId(), initAction)
+
+      remoteActions
+        // the originating connection already has the action - dont publish back to it
+        .filter(action => action.meta.antares.connectionId != client.connection.id)
+        // this is a consequential action marked localOnly
+        .filter(action => !(action.meta.antares.localOnly))
+        // /* TODO 7 Allow filtering per-client of remoteActions */
+        .subscribe(action => {
+          client.added('Antares.remoteActions', newId(), action)
+        })
+
+      client.ready()
+    } catch (ex) {
+      console.error('AP> ERROR: ', ex)
+    }
   }
-
-  client.added('Antares.remoteActions', newId(), initAction)
-
-  remoteActions
-    // the originating connection already has the action - dont publish back to it
-    .filter(action => action.meta.antares.connectionId != client.connection.id)
-    // this is a consequential action marked localOnly
-    .filter(action => !(action.meta.antares.localOnly))
-    .subscribe(action => {
-      client.added('Antares.remoteActions', newId(), action)
-    })
-
-  client.ready()
-  } catch (ex) {
-    console.error('AP> ERROR: ', ex)
-  }
-}
 
 // The remoteActionsProducer
 const defineRemoteActionsProducer = (store) => {
