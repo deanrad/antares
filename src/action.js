@@ -1,16 +1,17 @@
 import { fromJS, Map as iMap } from 'immutable'
 import { MetaEnhancers } from './config'
 
-export const enhanceActionMeta = (action) => {
+export const enhanceActionMeta = (action, oneTimeMetaEnhancer) => {
     let iAction = fromJS(action).updateIn(['meta', 'antares'], p => {
       return p || new iMap()
     })
 
     // apply meta enhancers, making sure they dont mess with anything
-    let enhancedIAction = MetaEnhancers.reduce((iAction, enhancer) => {
-      let newMeta = enhancer(iAction)
-      return iAction.mergeIn(['meta', 'antares'], newMeta)
-    }, iAction)
+    let enhancedIAction = MetaEnhancers.concat(oneTimeMetaEnhancer)
+      .reduce((iAction, enhancer) => {
+        let newMeta = enhancer(iAction)
+        return iAction.mergeIn(['meta', 'antares'], newMeta)
+      }, iAction)
 
     return enhancedIAction.toJS()
 }

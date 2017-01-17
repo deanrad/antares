@@ -48,7 +48,7 @@ export const AntaresInit = (AntaresConfig) => {
   })
 
   const Antares = {
-    announce: (actionCreatorOrType, payload, payloadEnhancer = (p => p)) => {
+    announce: (actionCreatorOrType, payload, payloadEnhancer = (a => null), metaEnhancer) => {
       let action
       let stowaway = payloadEnhancer()
 
@@ -60,7 +60,7 @@ export const AntaresInit = (AntaresConfig) => {
       } else {
         action = { type: actionCreatorOrType, payload: enhancedPayload }
       }
-      let enhancedAction = enhanceActionMeta(action)
+      let enhancedAction = enhanceActionMeta(action, metaEnhancer)
 
       // record in our store (throwing if invalid)
       store.dispatch(enhancedAction)
