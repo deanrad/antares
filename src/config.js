@@ -2,6 +2,7 @@
 // consts in mutable objects, which will be populated after initialization
 export const Agents = {}
 export const Epics = {}
+export const NewId = []
 export const ReducerForKey = []
 export const ViewReducer = []
 export const MetaEnhancers = [

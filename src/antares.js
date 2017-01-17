@@ -1,5 +1,5 @@
 import { fromJS, Map as iMap } from 'immutable'
-import { Agents, ReducerForKey, ViewReducer, MetaEnhancers, Epics, DispatchProxy } from './config'
+import { Agents, ReducerForKey, ViewReducer, MetaEnhancers, Epics, DispatchProxy, NewId } from './config'
 import { enhanceActionMeta } from './action'
 import { initializeStore } from './store'
 import { inAgencyRun } from './agency'
@@ -13,6 +13,7 @@ export const AntaresInit = (AntaresConfig) => {
   Object.assign(Agents, AntaresConfig.Agents)
   Object.assign(Epics, AntaresConfig.Epics)
   ViewReducer.push(AntaresConfig.ViewReducer)
+  NewId.push(AntaresConfig.newId)
   ReducerForKey.push(AntaresConfig.ReducerForKey)
   MetaEnhancers.push(...AntaresConfig.MetaEnhancers)
 
