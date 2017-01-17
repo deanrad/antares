@@ -1,5 +1,5 @@
 {
-  "name": "antares",
+  "name": "antares-protocol",
   "version": "0.1.0",
   "description": "Turns a keyed object of Actions, Reducers, Epics, and Selectors into a full async API for changing data The Redux Way™",
   "main": "dist/antares.js",
