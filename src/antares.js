@@ -48,12 +48,17 @@ export const AntaresInit = (AntaresConfig) => {
   })
 
   const Antares = {
-    announce: (actionCreatorOrType, payload) => {
+    announce: (actionCreatorOrType, payload, payloadEnhancer = (p => p)) => {
       let action
+      let stowaway = payloadEnhancer()
+
+      // Can't enhance non-Object payload like Numbers
+      let enhancedPayload = payload instanceof Object ? { ...stowaway, ...payload } : payload
+
       if (actionCreatorOrType.call) {
-        action = actionCreatorOrType.call(null, payload)
+        action = actionCreatorOrType.call(null, enhancedPayload)
       } else {
-        action = {type: actionCreatorOrType, payload}
+        action = { type: actionCreatorOrType, payload: enhancedPayload }
       }
       let enhancedAction = enhanceActionMeta(action)
 
