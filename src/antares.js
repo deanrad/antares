@@ -27,12 +27,17 @@ export const AntaresInit = (AntaresConfig) => {
     return userDispatchProxy(action)
   }
 
+  // dispatcher is a location-unaware function to dispatch and return a Promise
+  let dispatcher
+
   inAgencyRun('client', () => {
     DispatchProxy.push(dispatchProxy)
+    dispatcher = dispatchProxy
   })
 
   inAgencyRun('server', () => {
-    AntaresConfig.defineDispatchEndpoint(store)
+    const dispatchEndpoint = AntaresConfig.defineDispatchEndpoint(store)
+    dispatcher = intent => new Promise(resolve => dispatchEndpoint(null, intent))
     AntaresConfig.defineRemoteActionsProducer(store)
   })
 

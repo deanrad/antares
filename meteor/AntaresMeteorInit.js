@@ -19,13 +19,14 @@ const remoteActions = new Rx.Subject
 // The publication of the dispatched, and consequent actions is done by a final middleware
 // that runs after the epic middleware to ensure that every listener potentially can hear
 export const defineDispatchEndpoint = (store) => {
-  Meteor.methods({
-    'antares.dispatch': function (intent) {
+
+  const serverDispatcher = function (intent) {
       let client = this
       let action = intent
 
       // record the connection this came in on (a default MetaEnhancer)
-      action.meta.antares.connectionId = client.connection.id
+      if (!action.meta) action.meta = { antares: {} }
+      action.meta.antares.connectionId = client.connection && client.connection.id
       
       // simulate delay to test optimistic UI
       Promise.await(new Promise(resolve => setTimeout(resolve, 250)))
@@ -38,7 +39,14 @@ export const defineDispatchEndpoint = (store) => {
       console.log(`AP (${action.meta.antares.actionId})> Sending ${action.type} upstream`)
       remoteActions.next(action)
     }
-  })
+    
+    Meteor.methods({
+      'antares.dispatch': function (intent) {
+        return serverDispatcher.call(this, intent)
+      }
+    })
+
+    return serverDispatcher
 }
 
 // The function returned here will be the one which Antares.announce invokes
