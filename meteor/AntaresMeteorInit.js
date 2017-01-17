@@ -122,6 +122,7 @@ const defineRemoteActionsProducer = (store) => {
 
 const noopReducer = (state = {}, action) => state
 const mergeReducer = (state, action) => state.merge(action.payload)
+const deepMergeReducer = (state, action) => state.mergeDeep(action.payload)
 const appendReducer = (state, action) => state.push(action.payload)
 const noopiMapReducer = (state = new iMap(), action ) => state
 
@@ -147,7 +148,7 @@ export const AntaresMeteorInit = (antaresInit) => {
     })
 
     if (!AntaresConfig.ReducerForKey) {
-      AntaresConfig.ReducerForKey = (key) => noopReducer
+      AntaresConfig.ReducerForKey = (key) => deepMergeReducer
     }
     
     if (!AntaresConfig.MetaEnhancers) {
