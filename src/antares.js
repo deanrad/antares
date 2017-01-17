@@ -31,14 +31,30 @@ export const AntaresInit = (AntaresConfig) => {
   // dispatcher is a location-unaware function to dispatch and return a Promise
   let dispatcher
 
-  inAgencyRun('client', () => {
-    DispatchProxy.push(dispatchProxy)
-    dispatcher = dispatchProxy
-  })
-
+  // The dispatch endpoint on the server does
+  // 1) dispatch action to the store
+  // 2) notify other users
   inAgencyRun('server', () => {
     const dispatchEndpoint = AntaresConfig.defineDispatchEndpoint(store)
-    dispatcher = intent => new Promise(resolve => dispatchEndpoint(null, intent))
+    dispatcher = intent => {
+      return new Promise(resolve => dispatchEndpoint.call(null, intent))
+    }
+  })
+
+  // The client side version must do what the server does, but 
+  // invoke the dispatchProxy, which presumes the action has been reduced to the local store
+  inAgencyRun('client', () => {
+    DispatchProxy.push(dispatchProxy)
+
+    // when Antares.announce is called on the client
+    dispatcher = intent => {
+      store.dispatch(intent)
+      return dispatchProxy(intent)
+    }
+  })
+
+  // Provide the publication endpoint
+  inAgencyRun('server', () => {
     AntaresConfig.defineRemoteActionsProducer(store)
   })
 
@@ -64,10 +80,7 @@ export const AntaresInit = (AntaresConfig) => {
       let enhancedAction = enhanceActionMeta(action, metaEnhancer)
 
       // record in our store (throwing if invalid)
-      store.dispatch(enhancedAction)
-
-      // send upstream, returning a promise for server acknowledgement
-      return dispatchProxy(enhancedAction)
+      return dispatcher.call(null, enhancedAction)      
     },
     store,
     dispatchProxy,

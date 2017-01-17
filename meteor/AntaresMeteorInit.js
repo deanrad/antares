@@ -26,7 +26,7 @@ export const defineDispatchEndpoint = (store) => {
 
       // record the connection this came in on (a default MetaEnhancer)
       if (!action.meta) action.meta = { antares: {} }
-      action.meta.antares.connectionId = client.connection && client.connection.id
+      action.meta.antares.connectionId = client && client.connection && client.connection.id
       
       // simulate delay to test optimistic UI
       Promise.await(new Promise(resolve => setTimeout(resolve, 250)))
@@ -40,6 +40,7 @@ export const defineDispatchEndpoint = (store) => {
       remoteActions.next(action)
     }
     
+    // Make this available at a DDP Endpoint
     Meteor.methods({
       'antares.dispatch': function (intent) {
         return serverDispatcher.call(this, intent)

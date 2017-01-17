@@ -2,7 +2,7 @@ import { applyMiddleware, compose, createStore, combineReducers } from 'redux'
 import { createEpicMiddleware, combineEpics } from 'redux-observable'
 import { fromJS, Map as iMap } from 'immutable'
 import Rx from 'rxjs/Rx'
-import { Epics, ReducerForKey, ViewReducer, DispatchProxy } from './config'
+import { Epics, ReducerForKey, ViewReducer, DispatchProxy, NewId } from './config'
 import { inAgencyRun, isInAgency } from './agency'
 import { AntaresError } from './errors'
 import { enhanceActionMeta } from './action'
@@ -14,21 +14,24 @@ export const antaresReducer = (state, action) => {
     let { type, payload, meta } = action
 
     let { antares } = (meta || {})
-    let { key } = (antares || {})
-    let keyPath = [].concat(key)
+    let providedKey = (antares || {}).key
+    let providedKeyPath = [].concat(providedKey)
 
     // Fail if record cant be stored at this key
-    if (type === 'Antares.storeAtKey') {
-        // if (state.has(key)) throw new AntaresError(`Antares.storeAtKey: Store already has a value at ${key}`)
+    if (type === 'Antares.store') {
+        // provide an ID if they haven't
+        let keyPath = providedKey ? providedKeyPath : [ NewId[0]() ]
+
+        if (state.hasIn(keyPath)) throw new AntaresError(`Antares.store: Store already has a value at ${keyPath}`)
         return state.setIn(keyPath, fromJS(payload))
     }
 
     // An antares or other update which should target a specific key
-    if (type === 'Antares.updateAtKey' || key) {
-        if (! state.hasIn(keyPath)) throw new AntaresError(`Antares.updateAtKey: Store has no value at ${key}`)
+    if (type === 'Antares.update' || providedKey) {
+        if (! state.hasIn(providedKeyPath)) throw new AntaresError(`Antares.update: Store has no value at ${providedKeyPath}`)
 
         let reducer = ReducerForKey[0](key)
-        return state.updateIn(keyPath, state => reducer(state, action))
+        return state.updateIn(providedKeyPath, state => reducer(state, action))
     }
 
     if (type === 'Antares.init') {
