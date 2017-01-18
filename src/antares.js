@@ -17,8 +17,14 @@ export const AntaresInit = (AntaresConfig) => {
   ReducerForKey.push(AntaresConfig.ReducerForKey)
   MetaEnhancers.push(...AntaresConfig.MetaEnhancers)
 
+  // Construct the store for this Agent!
   const store = initializeStore()
 
+  // dispatcher is a location-unaware function to dispatch and return a Promise
+  // Should accept an intent, and return a Promise for an ACK
+  let dispatcher
+
+  // on the client define the endpoint for server communication
   const userDispatchProxy = AntaresConfig.defineDispatchProxy()
   const dispatchProxy = action => {
     // Withhold localOnly actions from the wire
@@ -27,9 +33,6 @@ export const AntaresInit = (AntaresConfig) => {
     }
     return userDispatchProxy(action)
   }
-
-  // dispatcher is a location-unaware function to dispatch and return a Promise
-  let dispatcher
 
   // The dispatch endpoint on the server does
   // 1) dispatch action to the store
@@ -41,8 +44,8 @@ export const AntaresInit = (AntaresConfig) => {
     }
   })
 
-  // The client side version must do what the server does, but 
-  // invoke the dispatchProxy, which presumes the action has been reduced to the local store
+  // The client side version must call the server, but only after first
+  // synchronously reducing it into its own store, validating it.
   inAgencyRun('client', () => {
     DispatchProxy.push(dispatchProxy)
 
@@ -82,6 +85,7 @@ export const AntaresInit = (AntaresConfig) => {
       // record in our store (throwing if invalid)
       return dispatcher.call(null, enhancedAction)      
     },
+    Actions: AntaresConfig.Actions,
     store,
     dispatchProxy,
     Config: { Agents }

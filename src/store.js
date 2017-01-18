@@ -14,7 +14,6 @@ export const antaresReducer = (state, action) => {
     // these are up to the client to manage - we perform no change
     if (action.type.startsWith('View.')) return state
 
-    console.log('AR> ', action.type)
     let { type, payload, meta } = action
 
     let { antares } = (meta || {})
