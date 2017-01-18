@@ -11,6 +11,9 @@ import { enhanceActionMeta } from './action'
 export const antaresReducer = (state, action) => {
     if (!state) return new iMap()
 
+    // these are up to the client to manage - we perform no change
+    if (action.type.startsWith('View.')) return state
+
     console.log('AR> ', action.type)
     let { type, payload, meta } = action
 
