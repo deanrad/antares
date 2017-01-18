@@ -11,6 +11,7 @@ import { enhanceActionMeta } from './action'
 export const antaresReducer = (state, action) => {
     if (!state) return new iMap()
 
+    console.log('AR> ', action.type)
     let { type, payload, meta } = action
 
     let { antares } = (meta || {})
@@ -22,7 +23,8 @@ export const antaresReducer = (state, action) => {
         // provide an ID if they haven't
         let keyPath = providedKey ? providedKeyPath : [ NewId[0]() ]
 
-        if (state.hasIn(keyPath)) throw new AntaresError(`Antares.store: Store already has a value at ${keyPath}`)
+        // OVERWRITE WHAT WAS THERE BEFORE
+        // Justification being: if the server tells you to do it, you should do it
         return state.setIn(keyPath, fromJS(payload))
     }
 
@@ -30,7 +32,7 @@ export const antaresReducer = (state, action) => {
     if (type === 'Antares.update' || providedKey) {
         if (! state.hasIn(providedKeyPath)) throw new AntaresError(`Antares.update: Store has no value at ${providedKeyPath}`)
 
-        let reducer = ReducerForKey[0](key)
+        let reducer = ReducerForKey[0](providedKey)
         return state.updateIn(providedKeyPath, state => reducer(state, action))
     }
 

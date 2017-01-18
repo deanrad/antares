@@ -65,7 +65,7 @@ export const AntaresInit = (AntaresConfig) => {
   })
 
   const Antares = {
-    announce: (actionCreatorOrType, payload, payloadEnhancer = (a => null), metaEnhancer) => {
+    announce: (actionCreatorOrType, payload, payloadEnhancer = (a => null), metaEnhancer = null) => {
       let action
       let stowaway = payloadEnhancer()
 
