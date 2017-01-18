@@ -31,8 +31,9 @@ export const defineDispatchEndpoint = (store) => {
       // simulate delay to test optimistic UI
       Promise.await(new Promise(resolve => setTimeout(resolve, 250)))
 
-      // Dispatching to the store may throw exception
-      console.log(`AD (${action.meta.antares.actionId})> ${action.type} `, action)
+      // Dispatching to the store may throw exception so log beforehand
+      console.log(`AD (${action.meta.antares.actionId})> ${action.type} `, 
+        { payload: action.payload, meta: action.meta })
       store.dispatch(action)
 
       // Add intent to the remoteActions(allClientsIntents) stream for subscribers
