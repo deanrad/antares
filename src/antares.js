@@ -86,11 +86,15 @@ export const AntaresInit = (AntaresConfig) => {
       // Can't enhance non-Object payload like Numbers
       let enhancedPayload = payload instanceof Object ? { ...stowaway, ...payload } : payload
 
+      // Use either of our syntaxes: ActionCreator, string, or action
       if (actionCreatorOrType.call) {
         action = actionCreatorOrType.call(null, enhancedPayload)
-      } else {
+      } else if (actionCreatorOrType instanceof String) {
         action = { type: actionCreatorOrType, payload: enhancedPayload }
+      } else {
+        action = actionCreatorOrType
       }
+
       let enhancedAction = enhanceActionMeta(action, metaEnhancer)
 
       // record in our store (throwing if invalid)
