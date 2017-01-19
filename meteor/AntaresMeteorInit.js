@@ -5,6 +5,7 @@ import { Map as iMap } from 'immutable'
 
 // allow consumers of the meteor package to skip having the npm dep as well
 export * from '../src/antares'
+import { mongoRendererFor } from './mongoRenderer'
 
 export const newId = () => {
   return Random.id()
@@ -165,6 +166,7 @@ export const AntaresMeteorInit = (antaresInit) => {
 
     console.log('Initializing deanius:antares meteor interface.')
     let antares = antaresInit({ ...AntaresConfig, ...meteorArgs })
+    Object.assign(antares, { mongoRendererFor })
     return antares
   }
 }
