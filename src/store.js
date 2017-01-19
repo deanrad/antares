@@ -107,7 +107,7 @@ const diffMiddleware = store => next => action => {
     }
   }
 
-  const rawDiff = (_mongoDiff && Object.keys(_mongoDiff).length > 0) ? _mongoDiff : null
+  const rawDiff = (_mongoDiff && Object.keys(_mongoDiff.updateOp).length > 0) ? _mongoDiff : null
   const mongoDiff = rawDiff
 
   _diff$.next({ action, iDiff, mongoDiff })
