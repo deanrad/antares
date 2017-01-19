@@ -28,8 +28,10 @@ export const defineDispatchEndpoint = (store) => {
       if (!action.meta) action.meta = { antares: {} }
       action.meta.antares.connectionId = client && client.connection && client.connection.id
       
-      // simulate delay to test optimistic UI
-      Promise.await(new Promise(resolve => setTimeout(resolve, 250)))
+      // simulate delay in Development to test optimistic UI
+      if (Meteor.isDevelopment) {
+        Promise.await(new Promise(resolve => setTimeout(resolve, 250)))
+      }
 
       // Dispatching to the store may throw exception so log beforehand
       console.log(`AD (${action.meta.antares.actionId})> ${action.type} `, 
