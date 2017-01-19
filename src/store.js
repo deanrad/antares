@@ -1,6 +1,10 @@
 import { applyMiddleware, compose, createStore, combineReducers } from 'redux'
 import { createEpicMiddleware, combineEpics } from 'redux-observable'
 import { fromJS, Map as iMap } from 'immutable'
+// immutablediff -  RFC 6902 diff as immutable List
+// mongodb-diff - mongo operator
+import iDiffer from 'immutablediff'
+import { diff as mongoDiffer } from 'mongodb-diff'
 import Rx from 'rxjs/Rx'
 import { Epics, ReducerForKey, ViewReducer, DispatchProxy, NewId } from './config'
 import { inAgencyRun, isInAgency } from './agency'
@@ -46,7 +50,7 @@ export const antaresReducer = (state, action) => {
 }
 
 // A utility function which incorporates Redux DevTools and optional middleware
-const makeStoreFromReducer = (reducer, ...middleware) => {
+const makeStoreFromReducer = (reducer, middleware) => {
     let composeEnhancers = compose
 
     // in browsers override compose to hook in DevTools
@@ -65,6 +69,47 @@ const dispatchToServer = (action) => {
     let dispatchProxy = DispatchProxy[0]
     dispatchProxy.call(null, action)
   }
+}
+
+const _diff$ = new Rx.Subject
+
+const diffMiddleware = store => next => action => { 
+  const preState = store.getState().antares
+  next(action) // reduce / dispatch it
+  const postState = store.getState().antares
+
+  // TODO could measure and do most performant
+  const iDiffList = iDiffer(preState, postState)
+  const iDiff = iDiffList.size > 0 ? iDiffList.toJS() : null
+
+
+  let key = action.meta && action.meta.antares && action.meta.antares.key
+  let collection = key && key.length === 2 && key[0]
+  let id = key instanceof Array ? key[key.length - 1] : key
+
+  let _mongoDiff
+  if (action.type === 'Antares.store') {
+    _mongoDiff = {
+      collection,
+      id,
+      upsert: true,
+      doc: action.payload
+    }
+  } else if (!action.type.startsWith('View.') && action.meta && action.meta.antares && action.meta.antares.key) {
+    let before = preState.getIn(action.meta.antares.key).toJS()
+    let after  = postState.getIn(action.meta.antares.key).toJS()
+    _mongoDiff = {
+      collection,
+      id,
+      update: true,
+      updateOp: mongoDiffer(before, after)
+    }
+  }
+
+  const rawDiff = (_mongoDiff && Object.keys(_mongoDiff).length > 0) ? _mongoDiff : null
+  const mongoDiff = rawDiff
+
+  _diff$.next({ action, iDiff, mongoDiff })
 }
 
 export const initializeStore = () => {
@@ -87,7 +132,15 @@ export const initializeStore = () => {
       view: viewReducer
   })
   
-  const store = makeStoreFromReducer(rootReducer, epicMiddleware)
+  // Each middleware recieves actions produced by the previous
+  const store = makeStoreFromReducer(rootReducer, [
+    epicMiddleware,
+    diffMiddleware
+  ])
   console.log('Initialized Antares store')
-  return store
+
+  // Give the store magical observable properties
+  return Object.assign(store, {
+    diff$: _diff$.asObservable()
+  })
 }
