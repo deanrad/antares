@@ -6,5 +6,5 @@ export const isInAgency = (agencyType) => {
 }
 
 export const inAgencyRun = (agencyType, fn) => {
-    isInAgency(agencyType) && fn.call(this)
+    isInAgency(agencyType) && fn.call(this || global)
 }
