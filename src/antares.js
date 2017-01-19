@@ -1,4 +1,5 @@
 import { fromJS, Map as iMap } from 'immutable'
+import Rx from 'rxjs'
 import { Agents, ReducerForKey, ViewReducer, MetaEnhancers, Epics, DispatchProxy, NewId } from './config'
 import { enhanceActionMeta } from './action'
 import { initializeStore } from './store'
@@ -67,6 +68,15 @@ export const AntaresInit = (AntaresConfig) => {
     remoteAction$.subscribe(action => store.dispatch(action))
   })
 
+  const subscribeRenderer = (renderer, { mode, xform }) => {
+    const { diff$ } = store
+    const modifier = xform ? xform : same => same
+    const stream = modifier(diff$)
+      //.observeOn(mode === 'async' ? Rx.Scheduler.async : Rx.Scheduler.immediate)
+
+    return stream.subscribe(renderer)
+  }
+
   const Antares = {
     announce: (actionCreatorOrType, payload, payloadEnhancer = (a => null), metaEnhancer = null) => {
       let action
@@ -86,6 +96,7 @@ export const AntaresInit = (AntaresConfig) => {
       return dispatcher.call(null, enhancedAction)      
     },
     Actions: AntaresConfig.Actions,
+    subscribeRenderer,
     store,
     dispatchProxy,
     Config: { Agents }

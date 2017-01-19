@@ -92,8 +92,9 @@ const diffMiddleware = store => next => action => {
     _mongoDiff = {
       collection,
       id,
+      update: true,
       upsert: true,
-      doc: action.payload
+      updateOp: mongoDiffer({}, action.payload)
     }
   } else if (!action.type.startsWith('View.') && action.meta && action.meta.antares && action.meta.antares.key) {
     let before = preState.getIn(action.meta.antares.key).toJS()
