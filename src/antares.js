@@ -68,8 +68,8 @@ export const AntaresInit = (AntaresConfig) => {
     remoteAction$.subscribe(action => store.dispatch(action))
   })
 
-  const subscribeRenderer = (renderer, { mode, xform }) => {
-    const { diff$ } = store
+  const subscribeRenderer = (renderer, { mode, xform }, alternateStream) => {
+    const diff$ = alternateStream ? alternateStream : store.diff$
     const modifier = xform ? xform : same => same
     const observer = (mode === 'async') ? s => s.observeOn(Rx.Scheduler.asap) : s => s
     const stream = observer(modifier(diff$))

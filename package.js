@@ -1,6 +1,6 @@
 Package.describe({
     name: 'deanius:antares',
-    version: '0.1.0',
+    version: '0.2.0',
     summary: 'Provides Antares Apps running in Meteor with things they need'
 })
 

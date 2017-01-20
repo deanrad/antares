@@ -34,6 +34,14 @@ export const antaresReducer = (state, action) => {
         return state.setIn(keyPath, fromJS(payload))
     }
 
+    if (type === 'Antares.forget') {
+        if (! state.hasIn(providedKeyPath)) {
+          throw new AntaresError(`Antares.forget: Store has no value at ${providedKeyPath}:
+                                  ${JSON.stringify(action, null, 2)}`)
+        }
+      return state.deleteIn(providedKeyPath)
+    }
+
     // An antares or other update which should target a specific key
     if (type === 'Antares.update' || providedKey) {
         if (! state.hasIn(providedKeyPath)) {
@@ -44,7 +52,7 @@ export const antaresReducer = (state, action) => {
         let reducer = ReducerForKey[0](providedKey)
         return state.updateIn(providedKeyPath, state => reducer(state, action))
     }
-
+    
     if (type === 'Antares.init') {
       return fromJS(action.payload)
     }
@@ -99,6 +107,12 @@ const diffMiddleware = store => next => action => {
       upsert: true,
       updateOp: mongoDiffer({}, action.payload)
     }
+  } else if (action.type === 'Antares.forget') {
+    _mongoDiff = {
+      collection,
+      id,
+      remove: true
+    }
   } else if (!action.type.startsWith('View.') && action.meta && action.meta.antares && action.meta.antares.key) {
     let before = preState.getIn(action.meta.antares.key).toJS()
     let after  = postState.getIn(action.meta.antares.key).toJS()
@@ -110,8 +124,7 @@ const diffMiddleware = store => next => action => {
     }
   }
 
-  const rawDiff = (_mongoDiff && Object.keys(_mongoDiff.updateOp).length > 0) ? _mongoDiff : null
-  const mongoDiff = rawDiff
+  const mongoDiff = (_mongoDiff && (_mongoDiff.remove || Object.keys(_mongoDiff.updateOp).length > 0)) ? _mongoDiff : null
 
   _diff$.next({ action, iDiff, mongoDiff })
 }

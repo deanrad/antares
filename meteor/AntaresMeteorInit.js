@@ -5,7 +5,8 @@ import { Map as iMap } from 'immutable'
 
 // allow consumers of the meteor package to skip having the npm dep as well
 export * from '../src/antares'
-import { mongoRendererFor } from './mongoRenderer'
+import { mongoRendererFor } from './mongoRendererFor'
+import { DDPToStoreRendererFor } from './DDPToStoreRendererFor'
 
 export const newId = () => {
   return Random.id()
@@ -34,9 +35,19 @@ export const defineDispatchEndpoint = (store) => {
         Promise.await(new Promise(resolve => setTimeout(resolve, 250)))
       }
 
+      let key = action.meta.antares.key
       // Dispatching to the store may throw exception so log beforehand
       console.log(`AD (${action.meta.antares.actionId})> ${action.type} `, 
-        { payload: action.payload, meta: action.meta })
+        {
+          payload: action.payload, 
+          meta: {
+            ...action.meta,
+            antares: {
+              ...action.meta.antares,
+              key: key && key.join('/')
+            }
+          }
+        })
       store.dispatch(action)
 
       // Add intent to the remoteActions(allClientsIntents) stream for subscribers
@@ -67,21 +78,28 @@ export const defineDispatchProxy = () => (action) => {
   })
 }
 
+// Analgous to ReactiveVar, but all (future) values available via .asObservable()
+// For past values as well - ReplaySubject
+const DDPMessage = new Rx.Subject
+
 // Exposes client-side DDP events as Antares actions
 const defineRemoteActionsConsumer = () => {
-  const action = new Rx.Subject
 
   Meteor.connection._stream.on('message', messageJSON => {
-    action.next(messageJSON)
+    try {
+      DDPMessage.next(JSON.parse(messageJSON))
+    } catch (ex) {
+      console.log('Antares:DDP:nonparsable')
+    }
   })
 
-  // TODO 7 - Allow limiting of this publication a) at startup b) at-will
+  // TODO 7 - Allow limiting of this subscription ?
   Meteor.subscribe('Antares.remoteActions')
-  const action$ = action
-    .map(JSON.parse)
+
+  const action$ = DDPMessage.asObservable()
     .filter(msg => msg.collection === 'Antares.remoteActions')
     .map(msg => msg.fields)
-    .asObservable()
+    
 
   return action$
 }
@@ -131,6 +149,27 @@ const deepMergeReducer = (state, action) => state.mergeDeep(action.payload)
 const appendReducer = (state, action) => state.push(action.payload)
 const noopiMapReducer = (state = new iMap(), action ) => state
 
+const remembererFor = store => cursor => {
+  let collName = cursor._cursorDescription.collectionName
+
+  cursor.observeChanges({
+    added(id, fields) {
+      let iState = store.getState().antares
+      let keyPath = [collName, id]
+      if (! iState.hasIn(keyPath)) {
+        console.log('AS> Remembering ', collName, id)
+        store.dispatch({ type: 'Antares.store', payload: fields, 
+          meta: { antares: {
+            key: keyPath,
+            localOnly: true
+          }} })
+      }
+    }
+  })
+
+  return cursor
+}
+
 // The default antares init function
 // Returns: an modified version of the initializer passed, extending its props with ours
 export const AntaresMeteorInit = (antaresInit) => {
@@ -164,9 +203,17 @@ export const AntaresMeteorInit = (antaresInit) => {
       AntaresConfig.ViewReducer = noopiMapReducer
     }
 
+    // define all our goodies
     console.log('Initializing deanius:antares meteor interface.')
-    let antares = antaresInit({ ...AntaresConfig, ...meteorArgs })
-    Object.assign(antares, { mongoRendererFor })
-    return antares
+    let Antares = antaresInit({ ...AntaresConfig, ...meteorArgs })
+
+    // add hooks for Meteor goodies
+    Object.assign(Antares, {
+      remember: remembererFor(Antares.store),
+      mongoRendererFor,
+      DDPToStoreRendererFor,
+      DDPMessage$: DDPMessage.asObservable()
+    })
+    return Antares
   }
 }
