@@ -48,11 +48,20 @@ export const defineDispatchEndpoint = (store) => {
             }
           }
         })
+
+      // Now attempt to dispatch the action to the local store.
+      // Any renderers that have been attached synchronously will run in the order subscribed.
+      // Any exception in a synchronous renderer will blow the stack here and cause the store's
+      // contents to remain unchanged
       store.dispatch(action)
 
-      // Add intent to the remoteActions(allClientsIntents) stream for subscribers
+      // Add this intent to the remoteActions stream for subscribers
       console.log(`AP (${action.meta.antares.actionId})> Sending ${action.type} upstream`)
       remoteActions.next(action)
+
+      // In case a sync renderer has put a result in, return it
+      // TODO document or eliminate this edge-case
+      return action.meta.result
     }
     
     // Make this available at a DDP Endpoint

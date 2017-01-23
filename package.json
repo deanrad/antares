@@ -1,6 +1,6 @@
 {
   "name": "antares-protocol",
-  "version": "0.2.1",
+  "version": "0.2.0",
   "description": "Turns a keyed object of Actions, Reducers, Epics, and Selectors into a full async API for changing data The Redux Way™",
   "main": "dist/antares.js",
   "scripts": {
@@ -57,7 +57,6 @@
     "isparta": "4.0.0",
     "json-loader": "0.5.4",
     "mocha": "3.x",
-    "object.values": "^1.0.4",
     "redux": "^3.6.0",
     "redux-observable": "^0.12.2",
     "sinon": "^1.17.5",

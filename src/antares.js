@@ -9,13 +9,14 @@ export * from './action'
 
 // Allow the caller to initialize us, extending their config onto ours
 export const AntaresInit = (AntaresConfig) => {
+
   // Store provided config fields
   Object.assign(Agents, AntaresConfig.Agents)
   Object.assign(Epics, AntaresConfig.Epics)
   ViewReducer.push(AntaresConfig.ViewReducer)
   NewId.push(AntaresConfig.newId)
   ReducerForKey.push(AntaresConfig.ReducerForKey)
-  MetaEnhancers.push(...(AntaresConfig.MetaEnhancers || []))
+  MetaEnhancers.push(...AntaresConfig.MetaEnhancers)
 
   // Construct the store for this Agent!
   const store = initializeStore()
@@ -25,8 +26,7 @@ export const AntaresInit = (AntaresConfig) => {
   let dispatcher
 
   // on the client define the endpoint for server communication
-  const userProxyFactory = AntaresConfig.defineDispatchProxy || (() => () => null)
-  const userDispatchProxy = userProxyFactory()
+  const userDispatchProxy = AntaresConfig.defineDispatchProxy()
   const dispatchProxy = action => {
     // Withhold localOnly actions from the wire
     if (action.meta && action.meta.antares && action.meta.antares.localOnly) {
@@ -68,11 +68,15 @@ export const AntaresInit = (AntaresConfig) => {
     remoteAction$.subscribe(action => store.dispatch(action))
   })
 
-  const subscribeRenderer = (renderer, { mode, xform }, alternateStream) => {
+  const subscribeRenderer = (renderer, opts, alternateStream) => {
     const diff$ = alternateStream ? alternateStream : store.diff$
+    const { mode, xform } = opts || { mode: 'sync' }
     const modifier = xform ? xform : same => same
     const observer = (mode === 'async') ? s => s.observeOn(Rx.Scheduler.asap) : s => s
-    const stream = observer(modifier(diff$))
+    const stream = observer(modifier(diff$)
+      // By definition, localOnly actions aren't rendered to other agents
+      .filter(({ action }) => ! (action.meta && action.meta.antares && action.meta.antares.localOnly) ))
+      // LEFTOFF supporting async mode
       //.observeOn(mode === 'async' ? Rx.Scheduler.async : Rx.Scheduler.immediate)
 
     return stream.subscribe(renderer)
@@ -89,7 +93,7 @@ export const AntaresInit = (AntaresConfig) => {
       // Use either of our syntaxes: ActionCreator, string, or action
       if (actionCreatorOrType.call) {
         action = actionCreatorOrType.call(null, enhancedPayload)
-      } else if (actionCreatorOrType.substr) { // because ! instanceof String !!!
+      } else if (actionCreatorOrType instanceof String) {
         action = { type: actionCreatorOrType, payload: enhancedPayload }
       } else {
         action = actionCreatorOrType
@@ -103,7 +107,6 @@ export const AntaresInit = (AntaresConfig) => {
     Actions: AntaresConfig.Actions,
     subscribeRenderer,
     store,
-    getState: () => store.getState().antares,
     dispatchProxy,
     Config: { Agents }
   }

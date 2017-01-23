@@ -130,7 +130,7 @@ const diffMiddleware = store => next => action => {
 }
 
 export const initializeStore = () => {
-  const userEpics = Object.values(Epics) // need shim for node testing
+  const userEpics = Object.values(Epics)
 
   // To each userEpic we append our own behaviors
   const antaresEnhancedEpics = userEpics.map(userEpic => {
@@ -143,7 +143,7 @@ export const initializeStore = () => {
   const rootEpic = combineEpics(...antaresEnhancedEpics)
   const epicMiddleware = createEpicMiddleware(rootEpic)
 
-  const viewReducer = ViewReducer[0] || ((state = null) => state)
+  const viewReducer = ViewReducer[0]
   const rootReducer = combineReducers({
       antares: antaresReducer,
       view: viewReducer
