@@ -1,6 +1,8 @@
 import { AntaresInit, getConfig, getUserConfig } from '../../src/antares'
 import { assert } from 'chai'
 import { minimalConfig } from './factories'
+import { shim } from 'object.values' // shim
+shim()
 
 describe('Antares.Init', () => {
   it('should be a function', () => {

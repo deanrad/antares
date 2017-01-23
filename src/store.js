@@ -143,7 +143,7 @@ export const initializeStore = () => {
   const rootEpic = combineEpics(...antaresEnhancedEpics)
   const epicMiddleware = createEpicMiddleware(rootEpic)
 
-  const viewReducer = ViewReducer[0]
+  const viewReducer = ViewReducer[0] || ((state = null) => state)
   const rootReducer = combineReducers({
       antares: antaresReducer,
       view: viewReducer

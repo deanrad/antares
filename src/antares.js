@@ -25,7 +25,8 @@ export const AntaresInit = (AntaresConfig) => {
   let dispatcher
 
   // on the client define the endpoint for server communication
-  const userDispatchProxy = AntaresConfig.defineDispatchProxy()
+  const userProxyFactory = AntaresConfig.defineDispatchProxy || (() => () => null)
+  const userDispatchProxy = userProxyFactory()
   const dispatchProxy = action => {
     // Withhold localOnly actions from the wire
     if (action.meta && action.meta.antares && action.meta.antares.localOnly) {
