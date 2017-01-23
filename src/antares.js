@@ -89,7 +89,7 @@ export const AntaresInit = (AntaresConfig) => {
       // Use either of our syntaxes: ActionCreator, string, or action
       if (actionCreatorOrType.call) {
         action = actionCreatorOrType.call(null, enhancedPayload)
-      } else if (actionCreatorOrType instanceof String) {
+      } else if (actionCreatorOrType.substr) { // because ! instanceof String !!!
         action = { type: actionCreatorOrType, payload: enhancedPayload }
       } else {
         action = actionCreatorOrType
