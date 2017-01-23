@@ -69,16 +69,18 @@ export const AntaresInit = (AntaresConfig) => {
   })
 
   const subscribeRenderer = (renderer, opts, alternateStream) => {
-    const diff$ = alternateStream ? alternateStream : store.diff$
+    // default to sync mode
     const { mode, xform } = opts || { mode: 'sync' }
-    const modifier = xform ? xform : same => same
-    const observer = (mode === 'async') ? s => s.observeOn(Rx.Scheduler.asap) : s => s
-    const stream = observer(modifier(diff$)
-      // By definition, localOnly actions aren't rendered to other agents
-      .filter(({ action }) => ! (action.meta && action.meta.antares && action.meta.antares.localOnly) ))
-      // LEFTOFF supporting async mode
-      //.observeOn(mode === 'async' ? Rx.Scheduler.async : Rx.Scheduler.immediate)
 
+    // a stream transformer for diffs (in lieu of providing an alternateStream)
+    const modifier = xform ? xform : (same => same)
+    const _stream = alternateStream ? alternateStream : modifier(store.diff$)
+
+    // The final stream we subscribe to with scheduling 
+    const observer = (mode === 'async') ? s => s.observeOn(Rx.Scheduler.asap) : s => s
+    const stream = observer(_stream)
+
+    // Returns a handle from which you can call .unsubscribe()
     return stream.subscribe(renderer)
   }
 

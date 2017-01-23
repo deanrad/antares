@@ -44,7 +44,7 @@ export const defineDispatchEndpoint = (store) => {
             ...action.meta,
             antares: {
               ...action.meta.antares,
-              key: key && key.join('/')
+              key: key && (key.join ? '[' + key.join(', ') + ']' : key)
             }
           }
         })
@@ -166,7 +166,7 @@ const remembererFor = store => cursor => {
       let iState = store.getState().antares
       let keyPath = [collName, id]
       if (! iState.hasIn(keyPath)) {
-        console.log('AS> Remembering ', collName, id)
+        console.log('AM> Remembering ', collName, id)
         store.dispatch({ type: 'Antares.store', payload: fields, 
           meta: { antares: {
             key: keyPath,

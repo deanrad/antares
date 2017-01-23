@@ -8,7 +8,7 @@ export const mongoRendererFor = (Collections) =>
 
         console.log('MDB>', {
             type: action.type,
-            key: key.join('/'),
+            key: (key.join ? '[' + key.join(', ') + ']' : key),
             ...mongoDiff
         })
 
