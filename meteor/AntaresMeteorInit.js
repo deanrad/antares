@@ -37,7 +37,7 @@ export const defineDispatchEndpoint = (store) => {
 
       let key = action.meta.antares.key
       // Dispatching to the store may throw exception so log beforehand
-      console.log(`AD (${action.meta.antares.actionId})> ${action.type}(${action.payload || ''})
+      console.log(`AD (${action.meta.antares.actionId})> ${action.type}(${action.payload && JSON.stringify(action.payload) || ''})
 `
       , {
           meta: {

@@ -9,14 +9,13 @@ export * from './action'
 
 // Allow the caller to initialize us, extending their config onto ours
 export const AntaresInit = (AntaresConfig) => {
-
   // Store provided config fields
   Object.assign(Agents, AntaresConfig.Agents)
   Object.assign(Epics, AntaresConfig.Epics)
   ViewReducer.push(AntaresConfig.ViewReducer)
   NewId.push(AntaresConfig.newId)
   ReducerForKey.push(AntaresConfig.ReducerForKey)
-  MetaEnhancers.push(...AntaresConfig.MetaEnhancers)
+  MetaEnhancers.push(...(AntaresConfig.MetaEnhancers || []))
 
   // Construct the store for this Agent!
   const store = initializeStore()

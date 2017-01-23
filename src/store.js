@@ -130,7 +130,7 @@ const diffMiddleware = store => next => action => {
 }
 
 export const initializeStore = () => {
-  const userEpics = Object.values(Epics)
+  const userEpics = Object.values(Epics) // need shim for node testing
 
   // To each userEpic we append our own behaviors
   const antaresEnhancedEpics = userEpics.map(userEpic => {

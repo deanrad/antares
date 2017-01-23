@@ -1,24 +1,17 @@
 import { AntaresInit, getConfig, getUserConfig } from '../../src/antares'
 import { assert } from 'chai'
-import defaultConfig from './factories'
+import { minimalConfig } from './factories'
 
-describe('antares', () => {
-  let result = AntaresInit(defaultConfig)
+describe('Antares.Init', () => {
+  it('should be a function', () => {
+    assert.isFunction(AntaresInit)
+  })
 
-  describe('default export', () => {
-    it('should be the initializer function', () => {
-      assert.isFunction(AntaresInit)
-    })
-
-    describe('return value', () => {
-      it('should have a Antares.originate function', () => {
-        expect(result).to.have.deep.property('Antares.originate')
-        assert.isFunction(result.Antares.originate)
-      })
-      it('should have a Antares.dispatch function', () => {
-        expect(result).to.have.deep.property('Antares.dispatch')
-        assert.isFunction(result.Antares.dispatch)
-      })
+  describe('whose return value', () => {
+    it('should have an "announce" function', () => {
+      let result = AntaresInit(minimalConfig)
+      expect(result).to.have.property('announce')
+      assert.isFunction(result.announce)
     })
   })
 })

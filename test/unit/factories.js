@@ -1,5 +1,1 @@
-export default {
-  Agents: {
-    any: () => true
-  }
-}
+export const minimalConfig = {}
