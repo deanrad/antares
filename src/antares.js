@@ -79,8 +79,11 @@ export const AntaresInit = (AntaresConfig) => {
     // The final stream we subscribe to with scheduling 
     const observer = (mode === 'async') ? s => s.observeOn(Rx.Scheduler.asap) : s => s
     const stream = observer(_stream)
+      // By definition, localOnly actions aren't SENT to other agents
+      // .filter(({ action }) => ! (action.meta && action.meta.antares && action.meta.antares.localOnly) ))
+      // LEFTOFF supporting async mode
+      //.observeOn(mode === 'async' ? Rx.Scheduler.async : Rx.Scheduler.immediate)
 
-    // Returns a handle from which you can call .unsubscribe()
     return stream.subscribe(renderer)
   }
 
@@ -95,7 +98,7 @@ export const AntaresInit = (AntaresConfig) => {
       // Use either of our syntaxes: ActionCreator, string, or action
       if (actionCreatorOrType.call) {
         action = actionCreatorOrType.call(null, enhancedPayload)
-      } else if (actionCreatorOrType instanceof String) {
+      } else if (actionCreatorOrType.substr) {
         action = { type: actionCreatorOrType, payload: enhancedPayload }
       } else {
         action = actionCreatorOrType

@@ -7,12 +7,12 @@ import { Map as iMap } from 'immutable'
 export * from '../src/antares'
 import { mongoRendererFor } from './mongoRendererFor'
 import { DDPToStoreRendererFor } from './DDPToStoreRendererFor'
+import { remoteActions } from './remoteActions'
 
 export const newId = () => {
   return Random.id()
 }
 
-const remoteActions = new Rx.Subject
 
 // Defines the upstream (aka server) implementation of dispatch which:
 //   dispatches to local store
@@ -30,11 +30,6 @@ export const defineDispatchEndpoint = (store) => {
       if (!action.meta) action.meta = { antares: {} }
       action.meta.antares.connectionId = client && client.connection && client.connection.id
       
-      // simulate delay in Development to test optimistic UI
-      if (Meteor.isDevelopment) {
-        Promise.await(new Promise(resolve => setTimeout(resolve, 250)))
-      }
-
       let key = action.meta.antares.key
       // Dispatching to the store may throw exception so log beforehand
       console.log(`AD (${action.meta.antares.actionId})> ${action.type} `,
@@ -60,7 +55,6 @@ export const defineDispatchEndpoint = (store) => {
       remoteActions.next(action)
 
       // In case a sync renderer has put a result in, return it
-      // TODO document or eliminate this edge-case
       return action.meta.result
     }
     
@@ -97,9 +91,7 @@ const defineRemoteActionsConsumer = () => {
   Meteor.connection._stream.on('message', messageJSON => {
     try {
       DDPMessage.next(JSON.parse(messageJSON))
-    } catch (ex) {
-      console.log('Antares:DDP:nonparsable')
-    }
+    } catch (ex) { /* ignore non-parsing DDP messages that aren't ours */ }
   })
 
   // TODO 7 - Allow limiting of this subscription ?
@@ -125,7 +117,7 @@ const createPublisher = (store) =>
 
       const initAction = {
         type: 'Antares.init',
-        payload: store.getState().antares.toJS()
+        payload: {} // let our client publications populate this
       }
 
       client.added('Antares.remoteActions', newId(), initAction)
