@@ -60,7 +60,9 @@ export const defineDispatchEndpoint = (store) => {
     
     // Make this available at a DDP Endpoint
     Meteor.methods({
-      'antares.dispatch': function (intent) {
+      'antares.acknowledge': function (intent) {
+
+        // if it throws, sanitized error is returned over DDP
         return serverDispatcher.call(this, intent)
       }
     })
@@ -74,7 +76,7 @@ export const defineDispatchEndpoint = (store) => {
 export const defineDispatchProxy = () => (action) => {
   // Return a Promise-wrapped DDP Meteor call
   return new Promise((resolve, reject) => {
-    Meteor.call('antares.dispatch', action, (err, result) => {
+    Meteor.call('antares.acknowledge', action, (err, result) => {
       if (err) return reject(err)
       resolve(result)
     })

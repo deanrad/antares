@@ -31,7 +31,7 @@ export const Antares = AntaresMeteorInit(AntaresInit)({
     Selectors
 })
 
-Antares.dispatch(...)
+Antares.announce(...)
 ```
 
 # Developer Notes
