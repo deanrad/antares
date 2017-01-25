@@ -82,8 +82,12 @@ const dispatchToServer = (action) => {
   }
 }
 
-const _diff$ = new Rx.Subject
+const antaresDiff$ = new Rx.Subject
+const viewDiff$ = new Rx.Subject
 
+// emits a stream of diff$ (paired with the actions that caused them and the resulting state)
+// resulting from the stream of Actions (including those consequences from Epics)
+// that have hit this store. It should be attached after epicMiddleware in the mw chain.
 const diffMiddleware = store => next => action => { 
   const preState = store.getState().antares
   next(action) // reduce / dispatch it
@@ -113,7 +117,11 @@ const diffMiddleware = store => next => action => {
       id,
       remove: true
     }
-  } else if (!action.type.startsWith('View.') && action.meta && action.meta.antares && action.meta.antares.key) {
+  } else if (action.type.startsWith('View.') ) {
+    let state = store.getState().view
+    // emit a change on a different stream
+    viewDiff$.next({ action, state })
+  } else if (action.meta && action.meta.antares && action.meta.antares.key) {
     let before = preState.getIn(action.meta.antares.key).toJS()
     let after  = postState.getIn(action.meta.antares.key).toJS()
     _mongoDiff = {
@@ -126,7 +134,7 @@ const diffMiddleware = store => next => action => {
 
   const mongoDiff = (_mongoDiff && (_mongoDiff.remove || Object.keys(_mongoDiff.updateOp).length > 0)) ? _mongoDiff : null
 
-  _diff$.next({ action, iDiff, mongoDiff })
+  antaresDiff$.next({ action, iDiff, mongoDiff })
 }
 
 export const initializeStore = () => {
@@ -158,6 +166,7 @@ export const initializeStore = () => {
 
   // Give the store magical observable properties
   return Object.assign(store, {
-    diff$: _diff$.asObservable()
+    diff$: antaresDiff$.asObservable(),
+    viewDiff$: viewDiff$.asObservable()
   })
 }

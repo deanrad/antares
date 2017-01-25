@@ -24,7 +24,6 @@ export const AntaresInit = (AntaresConfig) => {
   // Should accept an intent, and return a Promise for an ACK
   let dispatcher
 
-
   if (!AntaresConfig.defineDispatchProxy ||
       !AntaresConfig.defineDispatchEndpoint ||
       !AntaresConfig.defineRemoteActionsProducer ||
@@ -32,7 +31,6 @@ export const AntaresInit = (AntaresConfig) => {
   ) {
     dispatcher = () => console.error('Antares: running without full config')
   } else {
-
 
     // on the client define the endpoint for server communication
     const userDispatchProxy = AntaresConfig.defineDispatchProxy()
@@ -89,10 +87,6 @@ export const AntaresInit = (AntaresConfig) => {
     // The final stream we subscribe to with scheduling 
     const observer = (mode === 'async') ? s => s.observeOn(Rx.Scheduler.asap) : s => s
     const stream = observer(_stream)
-      // By definition, localOnly actions aren't SENT to other agents
-      // .filter(({ action }) => ! (action.meta && action.meta.antares && action.meta.antares.localOnly) ))
-      // LEFTOFF supporting async mode
-      //.observeOn(mode === 'async' ? Rx.Scheduler.async : Rx.Scheduler.immediate)
 
     return stream.subscribe(renderer)
   }
