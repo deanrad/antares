@@ -57,6 +57,7 @@
     "isparta": "4.0.0",
     "json-loader": "0.5.4",
     "mocha": "3.x",
+    "object.values": "1.x",
     "redux": "^3.6.0",
     "redux-observable": "^0.12.2",
     "sinon": "^1.17.5",
