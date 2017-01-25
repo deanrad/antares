@@ -20,6 +20,9 @@ const mainFile = manifest.main;
 const destinationFolder = path.dirname(mainFile);
 const exportFileName = path.basename(mainFile, path.extname(mainFile));
 
+const ov = require('object.values')
+ov.shim()
+
 function cleanDist(done) {
   del([destinationFolder]).then(() => done());
 }
