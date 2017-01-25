@@ -112,6 +112,9 @@ export const AntaresInit = (AntaresConfig) => {
     Actions: AntaresConfig.Actions,
     subscribeRenderer,
     store,
+    getState: () => store.getState().antares,
+    getViewState: () => store.getState().view,
+    Rx,
     dispatchProxy,
     Config: { Agents }
   }
