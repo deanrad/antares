@@ -1,5 +1,6 @@
 import { fromJS, Map as iMap } from 'immutable'
 import Rx from 'rxjs'
+export { default as Rx } from 'rxjs'
 import { Agents, ReducerForKey, ViewReducer, MetaEnhancers, Epics, DispatchProxy, NewId } from './config'
 import { enhanceActionMeta } from './action'
 import { initializeStore } from './store'

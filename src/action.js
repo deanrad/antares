@@ -1,8 +1,11 @@
 import { fromJS, Map as iMap } from 'immutable'
 import { MetaEnhancers } from './config'
+import Rx from 'rxjs'
+
+let { Observable } = Rx
 
 export const enhanceActionMeta = (action, oneTimeMetaEnhancer) => {
-    let iAction = fromJS(action).updateIn(['meta', 'antares'], p => {
+    let iAction = fromJS(action || {}).updateIn(['meta', 'antares'], p => {
       return p || new iMap()
     })
 
@@ -43,5 +46,30 @@ export const createConsequence = (parent, consequence) => {
   }
 }
 
-
-
+const begins = action => createConsequence(action, {
+  type: `${action.type}.begin`,
+  payload: action.payload
+})
+const ends = (action, result) => createConsequence(action, {
+  type: `${action.type}.end`,
+  payload: result,
+  meta: {
+    antares: {
+      concludesEpic: action.meta.antares.actionId
+    }
+  }
+})
+const errors = (action, err) => createConsequence(action, {
+  type: `${action.type}.error`,
+  payload: err
+})
+const concludes = (action, promise) => Observable.fromPromise(
+  promise
+    .then(result => ends(action, result))
+    .catch(err => errors(action, err))
+)
+export const createPromiseEpic = (type, promiseFactory) => action$ => action$
+    .ofType(type)
+    .mergeMap(action =>
+      Observable.of(begins(action))
+        .concat(concludes(action, promiseFactory(action))))
