@@ -111,8 +111,20 @@ export const AntaresInit = (AntaresConfig) => {
 
       let enhancedAction = enhanceActionMeta(action, metaEnhancer)
 
-      // record in our store (throwing if invalid)
-      return dispatcher.call(null, enhancedAction)      
+      let returnPromise = dispatcher.call(null, enhancedAction)
+      return returnPromise
+        // enhance with extra fields
+        .then(returnValue => Object.assign((returnValue || {}), {
+          returnValue,
+          action: enhancedAction,
+          epic: {
+            promiseEnd() {
+                return Antares.store.diff$.first(({ action }) => 
+                  action.type === `${enhancedAction.type}.end`
+                ).toPromise()
+              }
+          }
+        }))
     },
     subscribe: AntaresConfig.subscribeToRemoteActions,
     Actions: AntaresConfig.Actions,
