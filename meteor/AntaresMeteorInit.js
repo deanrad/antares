@@ -7,7 +7,7 @@ import { Map as iMap } from 'immutable'
 export * from '../src/antares'
 import { mongoRendererFor } from './mongoRendererFor'
 import { DDPToStoreRendererFor } from './DDPToStoreRendererFor'
-import { remoteActions } from './remoteActions'
+import { remoteActions, getFilterFor } from './remoteActions'
 
 export const newId = () => {
   return Random.id()
@@ -88,6 +88,7 @@ export const defineDispatchProxy = () => (action) => {
 const DDPMessage = new Rx.Subject
 
 // Exposes client-side DDP events as Antares actions
+// Must be subscribed to!
 const defineRemoteActionsConsumer = () => {
 
   Meteor.connection._stream.on('message', messageJSON => {
@@ -95,9 +96,6 @@ const defineRemoteActionsConsumer = () => {
       DDPMessage.next(JSON.parse(messageJSON))
     } catch (ex) { /* ignore non-parsing DDP messages that aren't ours */ }
   })
-
-  // TODO 7 - Allow limiting of this subscription ?
-  Meteor.subscribe('Antares.remoteActions')
 
   const action$ = DDPMessage.asObservable()
     .filter(msg => msg.collection === 'Antares.remoteActions')
@@ -109,7 +107,7 @@ const defineRemoteActionsConsumer = () => {
 
 // Close over a store, returning a Meteor.publish function over that store
 const createPublisher = (store) =>
-  function(/* TODO 7 Allow limiting of publication */) {
+  function(pubFilter) {
     try {
       let client = this
 
@@ -129,7 +127,7 @@ const createPublisher = (store) =>
         .filter(action => action.meta.antares.connectionId != client.connection.id)
         // this is a consequential action marked localOnly
         .filter(action => !(action.meta.antares.localOnly))
-        // /* TODO 7 Allow filtering per-client of remoteActions */
+        .filter(getFilterFor(pubFilter))
         .subscribe(action => {
           client.added('Antares.remoteActions', newId(), action)
         })
@@ -144,6 +142,11 @@ const createPublisher = (store) =>
 const defineRemoteActionsProducer = (store) => {
   const publisher = createPublisher(store)
   Meteor.publish('Antares.remoteActions', publisher)
+}
+
+// Allow remote actions to flow to us, if they meet the filter given.
+const subscribeToRemoteActions = (pubFilter) => {
+  Meteor.subscribe('Antares.remoteActions', pubFilter)
 }
 
 const noopReducer = (state = {}, action) => state
@@ -183,7 +186,8 @@ export const AntaresMeteorInit = (antaresInit) => {
       defineDispatchProxy,
       defineDispatchEndpoint,
       defineRemoteActionsProducer,
-      defineRemoteActionsConsumer
+      defineRemoteActionsConsumer,
+      subscribeToRemoteActions
     }
 
     // Define default agency names 'any', 'server' and 'client' for familiarity within Meteor

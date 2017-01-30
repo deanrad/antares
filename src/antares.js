@@ -114,6 +114,7 @@ export const AntaresInit = (AntaresConfig) => {
       // record in our store (throwing if invalid)
       return dispatcher.call(null, enhancedAction)      
     },
+    subscribe: AntaresConfig.subscribeToRemoteActions,
     Actions: AntaresConfig.Actions,
     subscribeRenderer,
     store,
