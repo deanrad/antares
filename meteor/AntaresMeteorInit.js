@@ -110,10 +110,14 @@ const createPublisher = (store) =>
   function(pubFilter) {
     try {
       let client = this
+      let sub
 
       console.log('  --------------  ')
       console.log(`AP> got subscriber ${client.connection.id}`)
-      client.onStop(() => console.log(`PUB> ddp subscriber ${client.connection.id} signed off`))
+      client.onStop(() => {
+        console.log(`PUB> ddp subscriber ${client.connection.id} signed off`)
+        if (sub) sub.unsubscribe()
+      })
 
       const initAction = {
         type: 'Antares.init',
@@ -122,7 +126,7 @@ const createPublisher = (store) =>
 
       client.added('Antares.remoteActions', newId(), initAction)
 
-      remoteActions
+      sub = remoteActions
         // the originating connection already has the action - dont publish back to it
         .filter(action => action.meta.antares.connectionId != client.connection.id)
         // this is a consequential action marked localOnly
