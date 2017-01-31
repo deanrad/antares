@@ -1,5 +1,6 @@
 import { fromJS, Map as iMap } from 'immutable'
 import Rx from 'rxjs'
+import Immutable from 'immutable'
 export { default as Rx } from 'rxjs'
 import { Agents, ReducerForKey, ViewReducer, MetaEnhancers, Epics, DispatchProxy, NewId } from './config'
 import { enhanceActionMeta } from './action'
@@ -133,6 +134,7 @@ export const AntaresInit = (AntaresConfig) => {
     getState: () => store.getState().antares,
     getViewState: () => store.getState().view,
     Rx,
+    Immutable,
     Config: { Agents }
   }
 

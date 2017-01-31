@@ -4,3 +4,7 @@
 * Antares.dispatch became `Antares.announce`
 * The DDP name of dispatch became `Antares.acknowledge`
 * Antares.subscribe MUST be called to see remoteActions (see all with '*')
+
+
+### [0.2.5](https://github.com/deanius/antares/releases/tag/v0.2.5)
+* Expose Immutable from Antares
