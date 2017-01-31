@@ -152,10 +152,14 @@ export const initializeStore = () => {
   const epicMiddleware = createEpicMiddleware(rootEpic)
 
   const viewReducer = ViewReducer[0]
-  const rootReducer = combineReducers({
+  const rootReducer = combineReducers(
+    isInAgency('client') ? {
       antares: antaresReducer,
       view: viewReducer
-  })
+    } : {
+      antares: antaresReducer
+    }
+  )
   
   // Each middleware recieves actions produced by the previous
   const store = makeStoreFromReducer(rootReducer, [
