@@ -115,7 +115,7 @@ const createPublisher = (store) =>
       console.log('  --------------  ')
       console.log(`AP> got subscriber ${client.connection.id}`)
       client.onStop(() => {
-        console.log(`PUB> ddp subscriber ${client.connection.id} signed off`)
+        console.log(`AP> ddp subscriber ${client.connection.id} signed off`)
         if (sub) sub.unsubscribe()
       })
 
