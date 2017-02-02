@@ -91,6 +91,7 @@ export const defineDispatchProxy = () => (action) => {
 // Analgous to ReactiveVar, but all (future) values available via .asObservable()
 // For past values as well - ReplaySubject
 const DDPMessage = new Rx.Subject
+const Subscriber = new Rx.Subject
 
 // Exposes client-side DDP events as Antares actions
 // Must be subscribed to!
@@ -119,6 +120,7 @@ const createPublisher = (store) =>
 
       console.log('  --------------  ')
       console.log(`AP> got subscriber ${client.connection.id}`)
+      Subscriber.next(client.connection)
 
       client.onStop(() => {
         console.log(`AP> ddp subscriber ${client.connection.id} signed off`)
@@ -224,13 +226,22 @@ export const AntaresMeteorInit = (antaresInit) => {
     console.log('Initializing deanius:antares meteor interface.')
     let Antares = antaresInit({ ...AntaresConfig, ...meteorArgs })
 
+    // make sure our firstSubscriberPromise fires
+    let firstSub = new Promise(resolve => {
+      let handle = Subscriber.asObservable().subscribe(() => {
+        handle.unsubscribe()
+        resolve()
+      })
+    })
+
     // add hooks for Meteor goodies
     Object.assign(Antares, {
       remember: remembererFor(Antares.store),
       mongoRendererFor,
       DDPToStoreRendererFor,
       DDPMessage$: DDPMessage.asObservable(),
-      subscribe: subscribeToRemoteActions
+      subscribe: subscribeToRemoteActions,
+      firstSubscriber: firstSub
     })
     return Antares
   }

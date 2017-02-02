@@ -1,7 +1,6 @@
 import Rx from 'rxjs'
-// BehaviorSubjectmakes the last published action available which
-//   helpsin the case of a subscriber just missing an action
-export const remoteActions = new Rx.BehaviorSubject
+
+export const remoteActions = new Rx.Subject
 
 // Returns a function implementing our remoteActions filter rules:
 // Subscription styles:

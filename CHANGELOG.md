@@ -15,3 +15,4 @@
 ### [0.2.7](https://github.com/deanius/antares/releases/tag/v0.2.7)
 * Underlay parent metadata in return from createConsequence
 * Better logging for store.dispatch errors
+* Antares.firstSubscriber promise inAgency: server
