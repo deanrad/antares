@@ -48,7 +48,12 @@ export const defineDispatchEndpoint = (store) => {
       // Any renderers that have been attached synchronously will run in the order subscribed.
       // Any exception in a synchronous renderer will blow the stack here and cause the store's
       // contents to remain unchanged
-      store.dispatch(action)
+      try {
+        store.dispatch(action)
+      } catch (ex) {
+        console.log(`AD Reduction Error (${action.meta.antares.actionId})> `, ex.message, ex.stack )
+        throw ex
+      }
 
       // Add this intent to the remoteActions stream for subscribers
       console.log(`AP (${action.meta.antares.actionId})> Sending ${action.type} upstream`)
