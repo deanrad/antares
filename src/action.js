@@ -32,6 +32,7 @@ export const enhanceActionMeta = (action, oneTimeMetaEnhancer) => {
 export const createConsequence = (parent, consequence) => {
   let { type, payload, meta } = consequence
   let antaresMeta = (meta || {}).antares
+  let parentMeta = (parent.meta && parent.meta.antares || {})
 
   return {
     type,
@@ -39,6 +40,7 @@ export const createConsequence = (parent, consequence) => {
     meta: {
       ...meta,
       antares: {
+        ...parentMeta,
         ...antaresMeta,
         parentActionId: parent.meta.antares.actionId
       }
