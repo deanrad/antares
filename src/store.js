@@ -100,6 +100,7 @@ const diffMiddleware = store => next => action => {
   let key = action.meta && action.meta.antares && action.meta.antares.key
   let collection = key && key.length === 2 && key[0]
   let id = key instanceof Array ? key[key.length - 1] : key
+  let keyPath = key instanceof Array ? key : [key]
 
   let _mongoDiff
   if (action.type === 'Antares.store') {
@@ -127,8 +128,8 @@ const diffMiddleware = store => next => action => {
       iDiff: viewDiff
      })
   } else if (action.meta && action.meta.antares && action.meta.antares.key) {
-    let before = preState.getIn(action.meta.antares.key).toJS()
-    let after  = postState.getIn(action.meta.antares.key).toJS()
+    let before = preState.getIn(keyPath).toJS()
+    let after  = postState.getIn(keyPath).toJS()
     _mongoDiff = {
       collection,
       id,
