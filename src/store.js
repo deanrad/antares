@@ -35,10 +35,6 @@ export const antaresReducer = (state, action) => {
     }
 
     if (type === 'Antares.forget') {
-        if (! state.hasIn(providedKeyPath)) {
-          throw new AntaresError(`Antares.forget: Store has no value at ${providedKeyPath}:
-                                  ${JSON.stringify(action, null, 2)}`)
-        }
       return state.deleteIn(providedKeyPath)
     }
 
@@ -52,9 +48,10 @@ export const antaresReducer = (state, action) => {
         let reducer = ReducerForKey[0](providedKey)
         return state.updateIn(providedKeyPath, state => reducer(state, action))
     }
-    
+
     if (type === 'Antares.init') {
-      return fromJS(action.payload)
+      // don't double-init if we resubscribe to remoteActions with a different criteria
+      return state.size == 0 ? fromJS(action.payload) : state
     }
 
     return state
@@ -88,8 +85,10 @@ const viewDiff$ = new Rx.Subject
 // emits a stream of diff$ (paired with the actions that caused them and the resulting state)
 // resulting from the stream of Actions (including those consequences from Epics)
 // that have hit this store. It should be attached after epicMiddleware in the mw chain.
-const diffMiddleware = store => next => action => { 
+const diffMiddleware = store => next => action => {
   const preState = store.getState().antares
+  const preViewState = store.getState().view
+
   next(action) // reduce / dispatch it
   const postState = store.getState().antares
 
@@ -109,7 +108,7 @@ const diffMiddleware = store => next => action => {
       id,
       update: true,
       upsert: true,
-      updateOp: mongoDiffer({}, action.payload)
+      updateOp: mongoDiffer({}, (action.payload || {}))
     }
   } else if (action.type === 'Antares.forget') {
     _mongoDiff = {
@@ -118,9 +117,15 @@ const diffMiddleware = store => next => action => {
       remove: true
     }
   } else if (action.type.startsWith('View.') ) {
-    let state = store.getState().view
+    let postViewState = store.getState().view
+    let viewIDiff = iDiffer(preViewState, postViewState)
+    const viewDiff = viewIDiff.size > 0 ? viewIDiff.toJS() : null
     // emit a change on a different stream
-    viewDiff$.next({ action, state })
+    viewDiff$.next({
+      action,
+      state: postViewState,
+      iDiff: viewDiff
+     })
   } else if (action.meta && action.meta.antares && action.meta.antares.key) {
     let before = preState.getIn(action.meta.antares.key).toJS()
     let after  = postState.getIn(action.meta.antares.key).toJS()
@@ -152,15 +157,11 @@ export const initializeStore = () => {
   const epicMiddleware = createEpicMiddleware(rootEpic)
 
   const viewReducer = ViewReducer[0]
-  const rootReducer = combineReducers(
-    isInAgency('client') ? {
+  const rootReducer = combineReducers({
       antares: antaresReducer,
       view: viewReducer
-    } : {
-      antares: antaresReducer
-    }
-  )
-  
+  })
+
   // Each middleware recieves actions produced by the previous
   const store = makeStoreFromReducer(rootReducer, [
     epicMiddleware,

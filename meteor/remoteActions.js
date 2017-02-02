@@ -1,5 +1,7 @@
 import Rx from 'rxjs'
-export const remoteActions = new Rx.Subject
+// BehaviorSubjectmakes the last published action available which
+//   helpsin the case of a subscriber just missing an action
+export const remoteActions = new Rx.BehaviorSubject
 
 // Returns a function implementing our remoteActions filter rules:
 // Subscription styles:
@@ -8,7 +10,7 @@ export const remoteActions = new Rx.Subject
 // Matching fields of action.meta.antares:
 // { key: 'foo' } - match actions having key: 'foo'
 // { key: ['coll'] } - match actions having key: ['coll', *], or ['coll']
-//   
+//
 export const getFilterFor = (pubFilter) => action => {
     // must explicitly pass the wildcard to be unlimited
     if (pubFilter === '*') return true

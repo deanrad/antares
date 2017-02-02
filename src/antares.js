@@ -1,6 +1,5 @@
-import { fromJS, Map as iMap } from 'immutable'
+import { default as Immutable, fromJS, Map as iMap } from 'immutable'
 import Rx from 'rxjs'
-import Immutable from 'immutable'
 export { default as Rx } from 'rxjs'
 import { Agents, ReducerForKey, ViewReducer, MetaEnhancers, Epics, DispatchProxy, NewId } from './config'
 import { enhanceActionMeta } from './action'
@@ -127,7 +126,6 @@ export const AntaresInit = (AntaresConfig) => {
           }
         }))
     },
-    subscribe: AntaresConfig.subscribeToRemoteActions,
     Actions: AntaresConfig.Actions,
     subscribeRenderer,
     store,

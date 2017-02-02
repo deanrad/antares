@@ -8,3 +8,6 @@
 
 ### [0.2.5](https://github.com/deanius/antares/releases/tag/v0.2.5)
 * Expose Immutable from Antares
+
+### [0.2.6](https://github.com/deanius/antares/releases/tag/v0.2.6)
+* Send last action, if applicable, once subscribed

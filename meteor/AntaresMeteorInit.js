@@ -29,7 +29,7 @@ export const defineDispatchEndpoint = (store) => {
       // record the connection this came in on (a default MetaEnhancer)
       if (!action.meta) action.meta = { antares: {} }
       action.meta.antares.connectionId = client && client.connection && client.connection.id
-      
+
       let key = action.meta.antares.key
       // Dispatching to the store may throw exception so log beforehand
       console.log(`AD (${action.meta.antares.actionId})> ${action.type} `,
@@ -57,7 +57,7 @@ export const defineDispatchEndpoint = (store) => {
       // In case a sync renderer has put a result in, return it
       return action.meta.result
     }
-    
+
     // Make this available at a DDP Endpoint
     Meteor.methods({
       'antares.acknowledge': function (intent) {
@@ -100,7 +100,7 @@ const defineRemoteActionsConsumer = () => {
   const action$ = DDPMessage.asObservable()
     .filter(msg => msg.collection === 'Antares.remoteActions')
     .map(msg => msg.fields)
-    
+
 
   return action$
 }
@@ -114,6 +114,7 @@ const createPublisher = (store) =>
 
       console.log('  --------------  ')
       console.log(`AP> got subscriber ${client.connection.id}`)
+
       client.onStop(() => {
         console.log(`AP> ddp subscriber ${client.connection.id} signed off`)
         if (sub) sub.unsubscribe()
@@ -121,7 +122,7 @@ const createPublisher = (store) =>
 
       const initAction = {
         type: 'Antares.init',
-        payload: {} // let our client publications populate this
+        payload: {} // sets, but will not overwrite, the contents of store.antares
       }
 
       client.added('Antares.remoteActions', newId(), initAction)
@@ -168,7 +169,7 @@ const remembererFor = store => cursor => {
       let keyPath = [collName, id]
       if (! iState.hasIn(keyPath)) {
         console.log('AM> Remembering ', collName, id)
-        store.dispatch({ type: 'Antares.store', payload: fields, 
+        store.dispatch({ type: 'Antares.store', payload: fields,
           meta: { antares: {
             key: keyPath,
             localOnly: true
@@ -205,7 +206,7 @@ export const AntaresMeteorInit = (antaresInit) => {
     if (!AntaresConfig.ReducerForKey) {
       AntaresConfig.ReducerForKey = (key) => deepMergeReducer
     }
-    
+
     if (!AntaresConfig.MetaEnhancers) {
       AntaresConfig.MetaEnhancers = []
     }
@@ -223,7 +224,8 @@ export const AntaresMeteorInit = (antaresInit) => {
       remember: remembererFor(Antares.store),
       mongoRendererFor,
       DDPToStoreRendererFor,
-      DDPMessage$: DDPMessage.asObservable()
+      DDPMessage$: DDPMessage.asObservable(),
+      subscribe: subscribeToRemoteActions
     })
     return Antares
   }
