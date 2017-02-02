@@ -48,6 +48,21 @@ export const createConsequence = (parent, consequence) => {
   }
 }
 
+export const localConsequence = (parent, consequence) => {
+  let { type, payload, meta } = consequence
+  return createConsequence(parent, {
+    type,
+    payload,
+    meta: {
+      ...meta,
+      antares: {
+        ...(meta || {}).antares,
+        localOnly: true
+      }
+    }
+  })
+}
+
 const begins = action => createConsequence(action, {
   type: `${action.type}.begin`,
   payload: action.payload

@@ -16,3 +16,4 @@
 * Underlay parent metadata in return from createConsequence
 * Better logging for store.dispatch errors
 * Antares.firstSubscriber promise inAgency: server
+* expose localConsequence factory for the common case of agent-local consequences
