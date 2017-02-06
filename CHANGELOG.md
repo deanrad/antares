@@ -20,3 +20,5 @@
 * Include the .action field on the return value of 'announce' with enhancedAction object
 * Added .startOfEpic() on the return value of 'announce'
 * Moved .endOfEpic() getter to the return value of 'announce'
+* Antares.originate - creates meta-enhanced action synchronously, same interface as announce
+* Honors the Types config option now - if an action.type has a corresponding validator function, it will be used

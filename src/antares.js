@@ -1,7 +1,7 @@
 import { default as Immutable, fromJS, Map as iMap } from 'immutable'
 import Rx from 'rxjs'
 export { default as Rx } from 'rxjs'
-import { Agents, ReducerForKey, ViewReducer, MetaEnhancers, Epics, DispatchProxy, NewId } from './config'
+import { Agents, ReducerForKey, ViewReducer, MetaEnhancers, Epics, DispatchProxy, NewId, Types } from './config'
 import { enhanceActionMeta } from './action'
 import { initializeStore } from './store'
 import { inAgencyRun } from './agency'
@@ -14,6 +14,7 @@ export const AntaresInit = (AntaresConfig) => {
   // Store provided config fields
   Object.assign(Agents, AntaresConfig.Agents)
   Object.assign(Epics, AntaresConfig.Epics)
+  Object.assign(Types, AntaresConfig.Types)
   ViewReducer.push(AntaresConfig.ViewReducer)
   NewId.push(AntaresConfig.newId)
   ReducerForKey.push(AntaresConfig.ReducerForKey)
@@ -93,7 +94,7 @@ export const AntaresInit = (AntaresConfig) => {
   }
 
   const Antares = {
-    announce: (actionCreatorOrType, payload, payloadEnhancer = (a => null), metaEnhancer = null) => {
+    originate: (actionCreatorOrType, payload, payloadEnhancer = (a => null), metaEnhancer = null) => {
       let action
       let stowaway = payloadEnhancer()
 
@@ -109,7 +110,21 @@ export const AntaresInit = (AntaresConfig) => {
         action = actionCreatorOrType
       }
 
+      // Look up the validator and synchronously validate the payload, or throw
+      const validator = Types[action.type] || (() => true)
+      validator(action.payload)
+
       let enhancedAction = enhanceActionMeta(action, metaEnhancer)
+      return enhancedAction
+    },
+    announce: (actionCreatorOrType, payload, payloadEnhancer = (a => null), metaEnhancer = null) => {
+      let enhancedAction
+
+      try {
+        enhancedAction = Antares.originate(actionCreatorOrType, payload, payloadEnhancer, metaEnhancer)
+      } catch (err) {
+        return Promise.reject(err)
+      }
 
       let returnPromise = dispatcher.call(null, enhancedAction)
       
@@ -137,14 +152,13 @@ export const AntaresInit = (AntaresConfig) => {
         }
       })
     },
-    Actions: AntaresConfig.Actions,
     subscribeRenderer,
     store,
     getState: () => store.getState().antares,
     getViewState: () => store.getState().view,
     Rx,
     Immutable,
-    Config: { Agents }
+    Config: AntaresConfig
   }
 
   console.info('Antares initialized.')
