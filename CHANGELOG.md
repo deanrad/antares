@@ -17,3 +17,4 @@
 * Better logging for store.dispatch errors
 * Antares.firstSubscriber promise inAgency: server
 * expose localConsequence factory for the common case of agent-local consequences
+* include the .action field on the return value of 'announce' with enhancedAction object

@@ -112,8 +112,6 @@ export const AntaresInit = (AntaresConfig) => {
       let enhancedAction = enhanceActionMeta(action, metaEnhancer)
 
       let returnPromise = dispatcher.call(null, enhancedAction)
-      return returnPromise
-        // enhance with extra fields
         .then(returnValue => Object.assign((returnValue || {}), {
           returnValue,
           action: enhancedAction,
@@ -133,6 +131,10 @@ export const AntaresInit = (AntaresConfig) => {
               }
           }
         }))
+      
+      return Object.assign(returnPromise, {
+        action: enhancedAction
+      })
     },
     Actions: AntaresConfig.Actions,
     subscribeRenderer,
