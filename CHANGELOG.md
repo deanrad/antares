@@ -16,5 +16,7 @@
 * Underlay parent metadata in return from createConsequence
 * Better logging for store.dispatch errors
 * Antares.firstSubscriber promise inAgency: server
-* expose localConsequence factory for the common case of agent-local consequences
-* include the .action field on the return value of 'announce' with enhancedAction object
+* Expose localConsequence factory for the common case of agent-local consequences
+* Include the .action field on the return value of 'announce' with enhancedAction object
+* Added .startOfEpic() on the return value of 'announce'
+* Moved .endOfEpic() getter to the return value of 'announce'

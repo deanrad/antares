@@ -112,28 +112,29 @@ export const AntaresInit = (AntaresConfig) => {
       let enhancedAction = enhanceActionMeta(action, metaEnhancer)
 
       let returnPromise = dispatcher.call(null, enhancedAction)
-        .then(returnValue => Object.assign((returnValue || {}), {
-          returnValue,
-          action: enhancedAction,
-          epic: {
-            promiseEnd() {
-                return Antares.store.diff$.first(({ action }) => 
-                  action.type === `${enhancedAction.type}.end` ||
-                  action.type === `${enhancedAction.type}.error`
-                )
-                .map(({ action }) => {
-                  if (action.type.endsWith('.error')) {
-                    throw action
-                  }
-                  return action
-                })
-                .toPromise()
-              }
-          }
-        }))
       
       return Object.assign(returnPromise, {
-        action: enhancedAction
+        action: enhancedAction,
+        startOfEpic: () => {
+          return Antares.store.diff$.first(({ action }) =>
+            action.type === `${enhancedAction.type}.begin`
+          )
+          .map(({ action }) => action)
+          .toPromise()
+        },
+        endOfEpic: () => {
+          return Antares.store.diff$.first(({ action }) =>
+            action.type === `${enhancedAction.type}.end` ||
+            action.type === `${enhancedAction.type}.error`
+          )
+          .map(({ action }) => {
+            if (action.type.endsWith('.error')) {
+              throw action
+            }
+            return action
+          })
+          .toPromise()
+        }
       })
     },
     Actions: AntaresConfig.Actions,
