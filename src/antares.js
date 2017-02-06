@@ -120,8 +120,16 @@ export const AntaresInit = (AntaresConfig) => {
           epic: {
             promiseEnd() {
                 return Antares.store.diff$.first(({ action }) => 
-                  action.type === `${enhancedAction.type}.end`
-                ).toPromise()
+                  action.type === `${enhancedAction.type}.end` ||
+                  action.type === `${enhancedAction.type}.error`
+                )
+                .map(({ action }) => {
+                  if (action.type.endsWith('.error')) {
+                    throw action
+                  }
+                  return action
+                })
+                .toPromise()
               }
           }
         }))
