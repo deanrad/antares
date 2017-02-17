@@ -127,17 +127,23 @@ const createPublisher = (store) =>
         if (sub) sub.unsubscribe()
       })
 
+      // To send over DDP, you call the added method, and pass a brand-new ID
+      // to ensure mergebox will not drop it
+      const sendToClient = action => {
+        client.added('Antares.remoteActions', newId(), action)
+      }
+
       const initAction = {
         type: 'Antares.init',
         payload: {} // sets, but will not overwrite, the contents of store.antares
       }
 
-      client.added('Antares.remoteActions', newId(), initAction)
+      sendToClient(initAction)
 
       if (pubFilter && pubFilter.key) {
         let record = store.getState().antares.getIn([].concat(pubFilter.key))
         if (record) {
-          client.added('Antares.remoteActions', newId(), {
+          sendToClient({
             type: 'Antares.store',
             payload: record.toJS(),
             meta: {
@@ -156,7 +162,7 @@ const createPublisher = (store) =>
         .filter(action => !(action.meta.antares.localOnly))
         .filter(getFilterFor(pubFilter))
         .subscribe(action => {
-          client.added('Antares.remoteActions', newId(), action)
+          sendToClient(action)
         })
 
       client.ready()
