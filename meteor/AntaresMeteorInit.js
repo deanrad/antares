@@ -113,7 +113,7 @@ const defineRemoteActionsConsumer = () => {
 
 // Close over a store, returning a Meteor.publish function over that store
 const createPublisher = (store) =>
-  function(pubFilter) {
+  function (pubFilter) {
     try {
       let client = this
       let sub
@@ -133,6 +133,21 @@ const createPublisher = (store) =>
       }
 
       client.added('Antares.remoteActions', newId(), initAction)
+
+      if (pubFilter && pubFilter.key) {
+        let record = store.getState().antares.getIn([].concat(pubFilter.key))
+        if (record) {
+          client.added('Antares.remoteActions', newId(), {
+            type: 'Antares.store',
+            payload: record.toJS(),
+            meta: {
+              antares: {
+                key: pubFilter.key
+              }
+            }
+          })
+        }
+      }
 
       sub = remoteActions
         // the originating connection already has the action - dont publish back to it
@@ -241,7 +256,8 @@ export const AntaresMeteorInit = (antaresInit) => {
       DDPToStoreRendererFor,
       DDPMessage$: DDPMessage.asObservable(),
       subscribe: subscribeToRemoteActions,
-      firstSubscriber: firstSub
+      firstSubscriber: firstSub,
+      startup: Promise.resolve()
     })
     return Antares
   }
