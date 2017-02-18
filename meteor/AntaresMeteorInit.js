@@ -31,18 +31,17 @@ export const defineDispatchEndpoint = (store) => {
       action.meta.antares.connectionId = client && client.connection && client.connection.id
 
       let key = action.meta.antares.key
+      let metaLog = {
+        ...action.meta,
+        antares: {
+          ...action.meta.antares,
+          key: key && (key.join ? '[' + key.join(', ') + ']' : key)
+        }
+      }
       // Dispatching to the store may throw exception so log beforehand
-      console.log(`AD (${action.meta.antares.actionId})> ${action.type} `,
-        {
-          payload: action.payload,
-          meta: {
-            ...action.meta,
-            antares: {
-              ...action.meta.antares,
-              key: key && (key.join ? '[' + key.join(', ') + ']' : key)
-            }
-          }
-        })
+      console.log(`AD (${action.meta.antares.actionId})> ${action.type}
+payload: ${JSON.stringify(action.payload, null, 2)}
+meta: ${JSON.stringify(metaLog, null, 2)}`)
 
       // Now attempt to dispatch the action to the local store.
       // Any renderers that have been attached synchronously will run in the order subscribed.
