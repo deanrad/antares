@@ -10,6 +10,7 @@
 * Expose Immutable from Antares
 
 ### [0.2.7](https://github.com/deanius/antares/releases/tag/v0.2.7)
+### [0.3.0](https://github.com/deanius/antares/releases/tag/v0.3.0)
 * Underlay parent metadata in return from createConsequence
 * Better logging for store.dispatch errors
 * Antares.firstSubscriber promise inAgency: server

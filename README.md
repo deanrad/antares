@@ -16,24 +16,15 @@ Turns a keyed object of Actions, Reducers, Epics, and Selectors into a full asyn
 meteor add deanius:antares      #
 ```
 
-# Usage (Meteor only)
+[Antares Reference Documentation](https://deanius.gitbooks.io/the-antares-protocol/antares-reference.html)
 
-```
-import { AntaresMeteorInit, AntaresInit } from 'meteor/deanius:antares'
+# Example Applications
 
-export const Antares = AntaresMeteorInit(AntaresInit)({
-    Agencies,
-    News,
-    Types,
-    ActionCreators,
-    ReducerForAction,
-    Epics,
-    Selectors
-})
+* [Smile Sender](https://github.com/deanius/antares-example-smile-sender) *Simplest Proof-Of-Concept*
+* [SMS-style Chat App](https://github.com/deanius/antares-example-chat) *Optimistic UI, DB rendering*
 
-Antares.announce(...)
-```
+# Help Wanted: Support Usage Outside of Meteor
+While this package's core parts are published [on npm](https://www.npmjs.com/package/antares-protocol),
+it currently uses Meteor's infrastructure for instantiating and communicating the web socket layer.
 
-# Developer Notes
-
-This is a hybrid npm package and Meteor Atmosphere package.
+Follow: [Issue #1](https://github.com/deanius/antares/issues/1) and [Issue #2](https://github.com/deanius/antares/issues/2)
