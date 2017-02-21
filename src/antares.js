@@ -39,7 +39,7 @@ export const AntaresInit = (AntaresConfig) => {
     const dispatchProxy = action => {
       // Withhold localOnly actions from the wire
       if (action.meta && action.meta.antares && action.meta.antares.localOnly) {
-        return
+        return Promise.resolve()
       }
       return userDispatchProxy(action)
     }
