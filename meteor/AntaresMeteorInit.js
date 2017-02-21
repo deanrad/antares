@@ -118,7 +118,7 @@ const createPublisher = (store) =>
       let sub
 
       console.log('  --------------  ')
-      console.log(`AP> got subscriber ${client.connection.id}`)
+      console.log(`AP> got subscriber ${client.connection.id}: ${JSON.stringify(pubFilter)}`)
       Subscriber.next(client.connection)
 
       client.onStop(() => {
