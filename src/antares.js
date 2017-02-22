@@ -118,13 +118,8 @@ export const AntaresInit = (AntaresConfig) => {
       return enhancedAction
     },
     announce: (actionCreatorOrType, payload, payloadEnhancer = (a => null), metaEnhancer = null) => {
-      let enhancedAction
-
-      try {
-        enhancedAction = Antares.originate(actionCreatorOrType, payload, payloadEnhancer, metaEnhancer)
-      } catch (err) {
-        return Promise.reject(err)
-      }
+      // Synchronously validate the payload, or throw
+      let enhancedAction = Antares.originate(actionCreatorOrType, payload, payloadEnhancer, metaEnhancer)
 
       let returnPromise = dispatcher.call(null, enhancedAction)
       

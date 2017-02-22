@@ -22,3 +22,6 @@
 * Honors the Types config option now - if an action.type has a corresponding validator function, it will be used
 * If subscribe called with a key, client receives current state of that key upon connect (DDP added)
 * Added Antares.startup
+
+### [0.3.1] (https://github.com/deanius/antares/releases/tag/v0.3.1)
+* Type errors blow the stack- check proactively if you want better UX
