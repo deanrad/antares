@@ -23,5 +23,5 @@
 * If subscribe called with a key, client receives current state of that key upon connect (DDP added)
 * Added Antares.startup
 
-### [0.3.1] (https://github.com/deanius/antares/releases/tag/v0.3.1)
+### [0.3.12] (https://github.com/deanius/antares/releases/tag/v0.3.12)
 * Type errors blow the stack- check proactively if you want better UX
