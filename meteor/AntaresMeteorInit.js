@@ -65,7 +65,9 @@ meta: ${JSON.stringify(metaLog, null, 2)}`)
     // Make this available at a DDP Endpoint
     Meteor.methods({
       'antares.acknowledge': function (intent) {
-
+        if (!intent || !intent.type) {
+          throw new Meteor.Error('Antares accepts only actions in the FSA format, and type(String) is required')
+        }
         // if it throws, sanitized error is returned over DDP
         return serverDispatcher.call(this, intent)
       }
