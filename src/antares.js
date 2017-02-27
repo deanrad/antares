@@ -5,7 +5,7 @@ export { default as Rx } from 'rxjs'
 import { Agents, ReducerForKey, ViewReducer, MetaEnhancers, Epics, DispatchProxy, NewId, Types } from './config'
 import { enhanceActionMeta } from './action'
 import { initializeStore } from './store'
-import { inAgencyRun } from './agency'
+import { inAgencyRun, isInAgency } from './agency'
 export * from './agency'
 export * from './action'
 
@@ -16,7 +16,7 @@ export const AntaresInit = (AntaresConfig) => {
   Object.assign(Agents, AntaresConfig.Agents)
   Object.assign(Epics, AntaresConfig.Epics)
   Object.assign(Types, AntaresConfig.Types)
-  ViewReducer.push(AntaresConfig.ViewReducer)
+  ViewReducer.push(AntaresConfig.ViewReducer || ((state = {}) => state))
   NewId.push(AntaresConfig.newId)
   ReducerForKey.push(AntaresConfig.ReducerForKey)
   MetaEnhancers.push(...(AntaresConfig.MetaEnhancers || []))
@@ -27,11 +27,9 @@ export const AntaresInit = (AntaresConfig) => {
   // Should accept an intent, and return a Promise for an ACK
   let dispatcher
 
-  if (!AntaresConfig.defineDispatchProxy ||
-      !AntaresConfig.defineDispatchEndpoint ||
-      !AntaresConfig.defineRemoteActionsProducer ||
-      !AntaresConfig.defineRemoteActionsConsumer
-  ) {
+  if (isInAgency('client') && (
+    !AntaresConfig.defineDispatchProxy || 
+    !AntaresConfig.defineRemoteActionsConsumer )) {
     dispatcher = () => console.error('Antares: running without full config')
   } else {
 
