@@ -1,3 +1,4 @@
+import './_polyfills'
 import { default as Immutable, fromJS, Map as iMap } from 'immutable'
 import Rx from 'rxjs'
 export { default as Rx } from 'rxjs'

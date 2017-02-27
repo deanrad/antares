@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/deanius/antares",
   "dependencies": {
+    "asteroid": "^2.0.3",
     "babel-core": "^6.18.2",
     "babel-loader": "^6.2.9",
     "immutable": "^3.8.1",
