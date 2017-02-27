@@ -11,9 +11,26 @@ Turns a keyed object of Actions, Reducers, Epics, and Selectors into a full asyn
 ![twitter link](https://img.shields.io/badge/twitter-@deaniusaur-55acee.svg)
 
 
-# Installation
+# Installation - Node, Browser
 ```
-meteor add deanius:antares      #
+yarn add antares-protocol
+
+// some-file.js
+import { AntaresInit } from 'antares-protocol'
+
+let Antares = AntaresInit({
+    connectionUrl: 'ws://server:port/path
+})
+```
+
+# Installation - Meteor
+```
+> meteor add deanius:antares
+
+// startup.js   (file name is arbitrary)
+import { AntaresInit } from 'meteor/deanius:antares'
+export const Antares = AntaresMeteorInit(AntaresInit)(AntaresConfig)
+
 ```
 
 [Antares Reference Documentation](https://deanius.gitbooks.io/the-antares-protocol/antares-reference.html)

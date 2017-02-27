@@ -14,20 +14,7 @@
   <script>
     let { AntaresInit } = antares
     let Antares = AntaresInit({
-        Agents: {client: () => true},
-        connectionUrl: 'https://antares-example-smile-sender.herokuapp.com/',
-        // a Promise-returning function
-        defineDispatchProxy: () => {
-            return (action) => {
-                console.log('AA> TODO announce', action)
-                return Promise.resolve(action)
-            }
-        },
-        // Will be a "Hot" Observable of events, once we know how we'll get them
-        // See https://github.com/Reactive-Extensions/RxJS/blob/master/doc/gettingstarted/creating.md
-        defineRemoteActionsConsumer: () => {
-            return antares.Rx.Observable.empty()
-        }
+        connectionUrl: 'ws://antares-example-smile-sender.herokuapp.com/websocket'
     })
     window.Antares = Antares
   </script>

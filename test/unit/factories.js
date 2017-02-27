@@ -1,1 +1,3 @@
-export const minimalConfig = {}
+export const minimalConfig = {
+    client: () => true
+}

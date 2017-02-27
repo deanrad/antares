@@ -6,6 +6,7 @@ import { Agents, ReducerForKey, ViewReducer, MetaEnhancers, Epics, DispatchProxy
 import { enhanceActionMeta } from './action'
 import { initializeStore } from './store'
 import { inAgencyRun, isInAgency } from './agency'
+import { createClass as createAsteroid } from 'asteroid'
 export * from './agency'
 export * from './action'
 
@@ -27,14 +28,26 @@ export const AntaresInit = (AntaresConfig) => {
   // Should accept an intent, and return a Promise for an ACK
   let dispatcher
 
-  if (isInAgency('client') && (
-    !AntaresConfig.defineDispatchProxy || 
-    !AntaresConfig.defineRemoteActionsConsumer )) {
+  if (isInAgency('client') &&
+    !(AntaresConfig.defineDispatchProxy || AntaresConfig.connectionUrl)) {
     dispatcher = () => console.error('Antares: running without full config')
   } else {
 
     // on the client define the endpoint for server communication
-    const userDispatchProxy = AntaresConfig.defineDispatchProxy()
+    let userDispatchProxy
+    if (AntaresConfig.defineDispatchProxy) {
+      userDispatchProxy = AntaresConfig.defineDispatchProxy()
+    } else if (AntaresConfig.connectionUrl) {
+      // use Asteroid to make a connection
+      const Asteroid = createAsteroid()
+      const asteroid = new Asteroid({
+        endpoint: AntaresConfig.connectionUrl
+      })
+      userDispatchProxy = action => {
+        return asteroid.call('antares.acknowledge', action)
+      }
+    }
+
     const dispatchProxy = action => {
       // Withhold localOnly actions from the wire
       if (action.meta && action.meta.antares && action.meta.antares.localOnly) {
@@ -71,9 +84,15 @@ export const AntaresInit = (AntaresConfig) => {
     })
 
     // Ensure we're listening for remoteActions and applying them to our store
+    // Will create a "Hot" Observable of events, if defined
+    // See https://github.com/Reactive-Extensions/RxJS/blob/master/doc/gettingstarted/creating.md
     inAgencyRun('client', () => {
-      const remoteAction$ = AntaresConfig.defineRemoteActionsConsumer()
-      remoteAction$.subscribe(action => store.dispatch(action))
+      if (AntaresConfig.defineRemoteActionsConsumer) {
+        const remoteAction$ = AntaresConfig.defineRemoteActionsConsumer()
+        remoteAction$.subscribe(action => store.dispatch(action))
+      } else {
+        console.log('pass defineRemoteActionsConsumer to Antares to receive remoteActions')
+      }
     })
   }
 

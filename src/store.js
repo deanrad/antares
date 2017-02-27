@@ -63,7 +63,10 @@ const makeStoreFromReducer = (reducer, middleware) => {
 
     // in browsers override compose to hook in DevTools
     inAgencyRun('client', function() {
-      if ( typeof window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ === 'function')
+      if (
+        typeof window !== 'undefined' &&
+        typeof window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ === 'function'
+      )
         composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
     })
 

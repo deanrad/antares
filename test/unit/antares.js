@@ -4,7 +4,7 @@ import { minimalConfig } from './factories'
 import { shim } from 'object.values' // shim
 shim()
 
-describe('Antares.Init', () => {
+describe('AntaresInit', () => {
   it('should be a function', () => {
     assert.isFunction(AntaresInit)
   })
