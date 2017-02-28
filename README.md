@@ -3,6 +3,7 @@
 Turns a keyed object of Actions, Reducers, Epics, and Selectors into a full async API for changing data The Redux Way™
 
 ![ES 2015](https://img.shields.io/badge/ES-2015-brightgreen.svg)
+ [![npm version](https://badge.fury.io/js/antares-protocol.svg)](https://badge.fury.io/js/antares-protocol)
 [![Travis build status](https://api.travis-ci.org/deanius/antares.svg?branch=master)](https://travis-ci.org/deanius/antares)
 [![Code Climate](https://codeclimate.com/github/deanius/antares/badges/gpa.svg)](https://codeclimate.com/github/deanius/antares)
 [![Test Coverage](https://codeclimate.com/github/deanius/antares/badges/coverage.svg)](https://codeclimate.com/github/deanius/antares)
