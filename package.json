@@ -70,8 +70,5 @@
   "babelBoilerplateOptions": {
     "entryFileName": "antares.js",
     "mainVarName": "antares"
-  },
-  "peerDependencies": {
-    "rxjs": "^5.0.1"
   }
 }

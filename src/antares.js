@@ -10,6 +10,10 @@ import { createClass as createAsteroid } from 'asteroid'
 export * from './agency'
 export * from './action'
 
+// TODO redundant to import in Meteor which has its own ddp lib already
+const Asteroid = createAsteroid()
+let asteroid
+
 // Allow the caller to initialize us, extending their config onto ours
 export const AntaresInit = (AntaresConfig) => {
 
@@ -39,8 +43,7 @@ export const AntaresInit = (AntaresConfig) => {
       userDispatchProxy = AntaresConfig.defineDispatchProxy()
     } else if (AntaresConfig.connectionUrl) {
       // use Asteroid to make a connection
-      const Asteroid = createAsteroid()
-      const asteroid = new Asteroid({
+      asteroid = new Asteroid({
         endpoint: AntaresConfig.connectionUrl
       })
       userDispatchProxy = action => {
@@ -164,6 +167,9 @@ export const AntaresInit = (AntaresConfig) => {
           .toPromise()
         }
       })
+    },
+    subscribe: (filter) => {
+      asteroid.subscribe(filter)
     },
     subscribeRenderer,
     store,
