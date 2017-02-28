@@ -94,7 +94,12 @@ export const AntaresInit = (AntaresConfig) => {
         const remoteAction$ = AntaresConfig.defineRemoteActionsConsumer()
         remoteAction$.subscribe(action => store.dispatch(action))
       } else {
-        console.log('pass defineRemoteActionsConsumer to Antares to receive remoteActions')
+        // If Meteor didn't do it for us, lets define our own
+        asteroid.ddp.on('added', ({collection, id, fields}) => {
+          if (collection === 'Antares.remoteActions') {
+            store.dispatch(fields)
+          }
+        })
       }
     })
   }
@@ -169,7 +174,7 @@ export const AntaresInit = (AntaresConfig) => {
       })
     },
     subscribe: (filter) => {
-      asteroid.subscribe(filter)
+      asteroid.subscribe('Antares.remoteActions', filter)
     },
     subscribeRenderer,
     store,
