@@ -178,6 +178,7 @@ export const AntaresInit = (AntaresConfig) => {
     },
     subscribeRenderer,
     store,
+    ddp: asteroid,
     getState: () => store.getState().antares,
     getViewState: () => store.getState().view,
     Rx,
