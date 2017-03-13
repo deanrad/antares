@@ -17,13 +17,15 @@ let asteroid
 // Allow the caller to initialize us, extending their config onto ours
 export const AntaresInit = (AntaresConfig) => {
 
+  const noopReducer = (state = {}) => state
+  
   // Store provided config fields
   Object.assign(Agents, AntaresConfig.Agents)
   Object.assign(Epics, AntaresConfig.Epics)
   Object.assign(Types, AntaresConfig.Types)
-  ViewReducer.push(AntaresConfig.ViewReducer || ((state = {}) => state))
+  ViewReducer.push(AntaresConfig.ViewReducer || noopReducer)
   NewId.push(AntaresConfig.newId)
-  ReducerForKey.push(AntaresConfig.ReducerForKey)
+  ReducerForKey.push(AntaresConfig.ReducerForKey || noopReducer)
   MetaEnhancers.push(...(AntaresConfig.MetaEnhancers || []))
 
   // Construct the store for this Agent!
