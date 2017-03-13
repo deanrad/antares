@@ -40,9 +40,11 @@ export const antaresReducer = (state, action) => {
 
     // An antares or other update which should target a specific key
     if (type === 'Antares.update' || providedKey) {
-        if (! state.hasIn(providedKeyPath)) {
-          throw new AntaresError(`Antares.update: Store has no value at ${providedKeyPath}:
+        // Gracefully ignore if we don't know how to apply this message
+        if (!state.hasIn(providedKeyPath)) {
+          console.info(`Antares.update: Store has no value at ${providedKeyPath}:
                                   ${JSON.stringify(action, null, 2)}`)
+          return state 
         }
 
         let reducer = ReducerForKey[0](providedKey)
