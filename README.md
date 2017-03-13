@@ -1,15 +1,14 @@
-![http://www.deanius.com/AntaresLogo.png](antares)
+![antares](http://www.deanius.com/AntaresLogo.png)
 
 Antares defines a protocol and API for distributed awareness among streaming agents.
 
 ![ES 2015](https://img.shields.io/badge/ES-2015-brightgreen.svg)
  [![npm version](https://badge.fury.io/js/antares-protocol.svg)](https://badge.fury.io/js/antares-protocol)
-[![Travis build status](https://api.travis-ci.org/deanius/antares.svg?branch=master)](https://travis-ci.org/deanius/antares)
+[![Travis build status](https://api.travis-ci.org/deanius/antares.svg?branch=master)](https://travis-ci.org/deanius/antares) 
 <!--
 [![Code Climate](https://codeclimate.com/github/deanius/antares/badges/gpa.svg)](https://codeclimate.com/github/deanius/antares)
 [![Test Coverage](https://codeclimate.com/github/deanius/antares/badges/coverage.svg)](https://codeclimate.com/github/deanius/antares)
--->
-[![Dependency Status](https://david-dm.org/deanius/antares.svg)](https://david-dm.org/deanius/antares)
+-->[![Dependency Status](https://david-dm.org/deanius/antares.svg)](https://david-dm.org/deanius/antares)
 [![devDependency Status](https://david-dm.org/deanius/antares/dev-status.svg)](https://david-dm.org/deanius/antares#info=devDependencies)
 ![twitter link](https://img.shields.io/badge/twitter-@deaniusaur-55acee.svg)
 
@@ -17,7 +16,7 @@ Antares defines a protocol and API for distributed awareness among streaming age
 # Installation - Node, Browser
 
 Antares' client functionality can be used in any JavaScript app, including
-those of the Create React App variety ([example](https://github.com/deanius/antares-example-static-smile-sender)) which can be hosted on static sites such as [S3](http://www.deanius.com/antares-example-static-smile-sender/) or [surge.sh](surge.sh).
+those of the Create React App variety ([example](https://github.com/deanius/antares-example-static-smile-sender)) which can be hosted on static sites such as [S3](http://www.deanius.com/antares-example-static-smile-sender/) or [surge.sh](https://surge.sh/).
 
 ```
 npm add -S antares-protocol
