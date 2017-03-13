@@ -1,7 +1,7 @@
 {
   "name": "antares-protocol",
   "version": "0.3.14",
-  "description": "Turns a keyed object of Actions, Reducers, Epics, and Selectors into a full async API for changing data The Redux Way™",
+  "description": "Antares defines a protocol and API for distributed awareness among streaming agents.",
   "main": "dist/antares.js",
   "scripts": {
     "test": "gulp",

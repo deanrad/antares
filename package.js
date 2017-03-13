@@ -1,7 +1,7 @@
 Package.describe({
     name: 'deanius:antares',
     version: '0.3.14',
-    summary: 'Provides Antares Apps running in Meteor with things they need'
+    summary: 'Antares defines a protocol and API for distributed awareness among streaming agents.'
 })
 
 Package.onUse(function(api) {
