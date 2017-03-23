@@ -55,8 +55,10 @@ meta: ${JSON.stringify(metaLog, null, 2)}`)
       }
 
       // Add this intent to the remoteActions stream for subscribers
-      console.log(`AP (${action.meta.antares.actionId})> Sending ${action.type} upstream`)
-      remoteActions.next(action)
+      if (!action.meta.antares.localOnly) {
+        console.log(`AP (${action.meta.antares.actionId})> Sending ${action.type} upstream`)
+        remoteActions.next(action)
+      }
 
       // In case a sync renderer has put a result in, return it
       return action.meta.result
