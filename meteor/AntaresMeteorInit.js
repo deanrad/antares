@@ -43,6 +43,8 @@ export const defineDispatchEndpoint = (store) => {
 payload: ${JSON.stringify(action.payload, null, 2)}
 meta: ${JSON.stringify(metaLog, null, 2)}`)
 
+      // TODO 1186 allow us to run a keyNotFound config function    
+    
       // Now attempt to dispatch the action to the local store.
       // Any renderers that have been attached synchronously will run in the order subscribed.
       // Any exception in a synchronous renderer will blow the stack here and cause the store's
@@ -143,6 +145,7 @@ const createPublisher = (store) =>
 
       sendToClient(initAction)
 
+      // 1186 allow this to be custmized with a keyNotFound config function
       if (pubFilter && pubFilter.key) {
         let record = store.getState().antares.getIn([].concat(pubFilter.key))
         if (record) {
