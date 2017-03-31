@@ -145,6 +145,11 @@ const diffMiddleware = store => next => action => {
 
   const mongoDiff = (_mongoDiff && (_mongoDiff.remove || Object.keys(_mongoDiff.updateOp).length > 0)) ? _mongoDiff : null
 
+  // Reasons this line can fail:
+  // - Reducer throws an error
+  // - Renderer attached synchronously throws an error
+  // if a synchronous renderer causes this to blow up, we do the least surprising thing and 
+  // resubscribe the renderer
   antaresDiff$.next({ action, iDiff, mongoDiff })
 }
 

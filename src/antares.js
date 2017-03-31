@@ -115,10 +115,27 @@ export const AntaresInit = (AntaresConfig) => {
     const _stream = alternateStream ? alternateStream : modifier(store.diff$)
 
     // The final stream we subscribe to with scheduling 
-    const observer = (mode === 'async') ? s => s.observeOn(Rx.Scheduler.asap) : s => s
-    const stream = observer(_stream)
+    const observe = (mode === 'async') ? s => s.observeOn(Rx.Scheduler.asap) : s => s
+    const stream = observe(_stream)
+    const defer = (typeof setImmediate === 'function') ? setImmediate : fn => setTimeout(fn, 0)    
 
-    return stream.subscribe(renderer)
+    // NOTE: A stream will resubscribe in case of error, but the handle will be of no use to call unsubscribe on it
+    // because we're subscribed on a new handle now. The fix would be to return a handle-getting function. Messy?
+    const observer = {
+      next: (action) => {
+        try {
+          return renderer(action)
+        } catch (ex) {
+          // reestablish our subscription in the next turn of the event loop
+          defer(() => stream.subscribe(observer))
+          // but let our caller see
+          throw ex
+        }
+      },
+      error: (e) => console.warn('SR> saw error', e),
+      complete: (e) => console.warn('SR> done')
+    }
+    return stream.subscribe(observer)
   }
 
   const Antares = {
@@ -164,6 +181,7 @@ export const AntaresInit = (AntaresConfig) => {
           return Antares.store.diff$.first(({ action }) =>
             action.type === `${enhancedAction.type}.end` ||
             action.type === `${enhancedAction.type}.error`
+            // TODO && action.meta.antares.concludesEpic === enhancedAction.meta.antares.actionId
           )
           .map(({ action }) => {
             if (action.type.endsWith('.error')) {
@@ -180,7 +198,7 @@ export const AntaresInit = (AntaresConfig) => {
     },
     subscribeRenderer,
     store,
-    ddp: asteroid,
+    asteroid,
     getState: () => store.getState().antares,
     getViewState: () => store.getState().view,
     Rx,
