@@ -9,6 +9,7 @@
     "test-browser": "gulp test-browser",
     "watch": "gulp watch",
     "build": "gulp build",
+    "prepublish": "gulp build",
     "coverage": "gulp coverage"
   },
   "repository": {

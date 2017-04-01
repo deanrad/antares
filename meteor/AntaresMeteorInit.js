@@ -266,7 +266,7 @@ export const AntaresMeteorInit = (antaresInit) => {
       remember: remembererFor(Antares.store),
       mongoRendererFor,
       DDPToStoreRendererFor,
-      DDPMessage$: DDPMessage.asObservable(),
+      ddpMessage$: DDPMessage.asObservable(),
       subscribe: subscribeToRemoteActions,
       firstSubscriber: firstSub,
       startup: Promise.resolve()

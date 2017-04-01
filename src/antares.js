@@ -33,6 +33,7 @@ export const AntaresInit = (AntaresConfig) => {
   // dispatcher is a location-unaware function to dispatch and return a Promise
   // Should accept an intent, and return a Promise for an ACK
   let dispatcher
+  let remoteAction$
 
   if (isInAgency('client') &&
     !(AntaresConfig.defineDispatchProxy || AntaresConfig.connectionUrl)) {
@@ -92,19 +93,28 @@ export const AntaresInit = (AntaresConfig) => {
     // Will create a "Hot" Observable of events, if defined
     // See https://github.com/Reactive-Extensions/RxJS/blob/master/doc/gettingstarted/creating.md
     inAgencyRun('client', () => {
-      if (AntaresConfig.defineRemoteActionsConsumer) {
-        const remoteAction$ = AntaresConfig.defineRemoteActionsConsumer()
-        remoteAction$.subscribe(action => store.dispatch(action))
-      } else {
-        // If Meteor didn't do it for us, lets define our own
-        asteroid.ddp.on('added', ({collection, id, fields}) => {
-          if (collection === 'Antares.remoteActions') {
-            store.dispatch(fields)
-          }
-        })
+      if (!AntaresConfig.defineRemoteActionsConsumer) {
+        AntaresConfig.defineRemoteActionsConsumer = () => {
+          let actionSubject = new Rx.Subject()
+          // If Meteor didn't do it for us, lets define our own
+          asteroid.ddp.on('added', ({ collection, id, fields }) => {
+            if (collection === 'Antares.remoteActions') {
+              actionSubject.next(fields)
+              store.dispatch(fields)
+            }
+          })
+          return actionSubject.asObservable()
+        }
       }
+       
+      remoteAction$ = AntaresConfig.defineRemoteActionsConsumer()
+
+      // TODO - any store reduction error here will disconnect. Needs same fix as 1194.
+      // Note - event emitter style ddp.on('added', cb) may be more appropriate than a 
+      // subscription that needs reattaching.
+      remoteAction$.subscribe(action => store.dispatch(action))
     })
-  }
+  }  
 
   const subscribeRenderer = (renderer, opts, alternateStream) => {
     // default to sync mode
@@ -181,7 +191,7 @@ export const AntaresInit = (AntaresConfig) => {
           return Antares.store.diff$.first(({ action }) =>
             action.type === `${enhancedAction.type}.end` ||
             action.type === `${enhancedAction.type}.error`
-            // TODO && action.meta.antares.concludesEpic === enhancedAction.meta.antares.actionId
+            // TODO 1195:  action.meta.antares.concludesEpic === enhancedAction.meta.antares.actionId
           )
           .map(({ action }) => {
             if (action.type.endsWith('.error')) {
@@ -198,6 +208,7 @@ export const AntaresInit = (AntaresConfig) => {
     },
     subscribeRenderer,
     store,
+    remoteAction$,
     asteroid,
     getState: () => store.getState().antares,
     getViewState: () => store.getState().view,
