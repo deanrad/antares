@@ -1,3 +1,5 @@
 export const minimalConfig = {
-    client: () => true
+    client: () => true,
+    defineDispatchEndpoint: () => null,
+    defineRemoteActionsProducer: () => null
 }
