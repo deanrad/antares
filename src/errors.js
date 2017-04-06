@@ -1,1 +1,1 @@
-export class AntaresError extends Error {}
+export class AntaresError extends Error { }

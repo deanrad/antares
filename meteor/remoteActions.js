@@ -30,7 +30,7 @@ export const getFilterFor = (pubFilter) => action => {
         if (actionKey === filterKey) continue
 
         // array keys pass if they match up to the filter specified
-        for (let i=0; i<filterKey.length; i++) {
+        for (let i = 0; i < filterKey.length; i++) {
             if (actionKey[i] != filterKey[i]) return false
         }
     }

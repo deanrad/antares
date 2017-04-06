@@ -5,7 +5,6 @@
 * The DDP name of dispatch became `Antares.acknowledge`
 * Antares.subscribe MUST be called to see remoteActions (see all with '*')
 
-
 ### [0.2.5](https://github.com/deanius/antares/releases/tag/v0.2.5)
 * Expose Immutable from Antares
 
@@ -25,3 +24,11 @@
 
 ### [0.3.12] (https://github.com/deanius/antares/releases/tag/v0.3.12)
 * Type errors blow the stack- check proactively if you want better UX
+
+### [0.3.15] (https://github.com/deanius/antares/releases/tag/v0.3.15)
+* Type errors become rejected promises with err instanceof ValidationError
+
+### [0.3.16]
+* Top level exports are not off Antares but the main export (Rx, Immutable iMap iList fromJS, createReducer)
+* Reformatted source files to 4 indents
+

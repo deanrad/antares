@@ -1,12 +1,12 @@
 import { Meteor } from 'meteor/meteor'
 
-export const DDPToStoreRendererFor = (Collections, store, nameMapper = (n => n) ) => {
+export const DDPToStoreRendererFor = (Collections, store, nameMapper = (n => n)) => {
     const renderer = ddpMsg => {
         let { collection, msg, fields, id } = ddpMsg
         let prop = collection && nameMapper(collection)
 
         // Only those we care about
-        if (! Collections[prop]) return
+        if (!Collections[prop]) return
         // if (prop === 'Creations' ) { debugger }
 
         let action
@@ -20,7 +20,7 @@ export const DDPToStoreRendererFor = (Collections, store, nameMapper = (n => n) 
                         source: 'DDPToStoreRenderer'
                     }
                 }
-            }            
+            }
         }
         if (msg === 'changed') {
             action = {
@@ -32,7 +32,7 @@ export const DDPToStoreRendererFor = (Collections, store, nameMapper = (n => n) 
                         source: 'DDPToStoreRenderer'
                     }
                 }
-            }            
+            }
         }
         if (msg === 'removed') {
             action = {
@@ -45,7 +45,7 @@ export const DDPToStoreRendererFor = (Collections, store, nameMapper = (n => n) 
                 }
             }
         }
-        
+
         if (action) {
             return store.dispatch(action)
         }
