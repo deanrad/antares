@@ -1,6 +1,6 @@
 {
   "name": "antares-protocol",
-  "version": "0.3.16",
+  "version": "0.3.17",
   "description": "Antares defines a protocol and API for distributed awareness among streaming agents.",
   "main": "dist/antares.js",
   "scripts": {
@@ -33,6 +33,7 @@
     "mongodb-diff": "^0.4.3",
     "redux": "^3.6.0",
     "redux-act": "^1.1.0",
+    "redux-immutable": "^4.0.0",
     "redux-observable": "^0.13.0",
     "rxjs": "^5.2.0"
   },

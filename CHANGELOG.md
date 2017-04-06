@@ -32,3 +32,6 @@
 * Top level exports are not off Antares but the main export (Rx, Immutable iMap iList fromJS, createReducer)
 * Reformatted source files to 4 indents
 
+### [0.3.17]
+* Added (immutable) combineReducers as an export
+

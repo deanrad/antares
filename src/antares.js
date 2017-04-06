@@ -4,6 +4,7 @@ export { default as Rx } from 'rxjs'
 export const { Observable } = Rx
 export { default as Immutable, fromJS, Map as iMap, List as iList } from 'immutable'
 export { createReducer } from 'redux-act'
+export { combineReducers } from 'redux-immutable'
 import { Agents, ReducerForKey, ViewReducer, MetaEnhancers, Epics, DispatchProxy, NewId, Types } from './config'
 import { enhanceActionMeta } from './action'
 import { initializeStore } from './store'
