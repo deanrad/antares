@@ -117,7 +117,7 @@ const defineRemoteActionsConsumer = () => {
 }
 
 // Close over a store, returning a Meteor.publish function over that store
-const createPublisher = (store) =>
+const createPublisher = (store, agentId) =>
     function (pubFilter) {
         try {
             let client = this
@@ -140,7 +140,8 @@ const createPublisher = (store) =>
 
             const initAction = {
                 type: 'Antares.init',
-                payload: {} // sets, but will not overwrite, the contents of store.antares
+                payload: {}, // sets, but will not overwrite, the contents of store.antares
+                meta: { parentAgentId: agentId }
             }
 
             sendToClient(initAction)
@@ -178,8 +179,8 @@ const createPublisher = (store) =>
     }
 
 // The remoteActionsProducer
-const defineRemoteActionsProducer = (store) => {
-    const publisher = createPublisher(store)
+const defineRemoteActionsProducer = (store, agentId) => {
+    const publisher = createPublisher(store, agentId)
     Meteor.publish('Antares.remoteActions', publisher)
 }
 

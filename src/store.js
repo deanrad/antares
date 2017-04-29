@@ -10,6 +10,7 @@ import { Epics, ReducerForKey, ViewReducer, DispatchProxy, NewId } from './confi
 import { inAgencyRun, isInAgency } from './agency'
 import { AntaresError } from './errors'
 import { enhanceActionMeta } from './action'
+import { remoteActions } from '../meteor/remoteActions'
 
 // handles storing, updating, and removing
 export const antaresReducer = (state, action) => {
@@ -77,10 +78,15 @@ const makeStoreFromReducer = (reducer, middleware) => {
     ))
 }
 
-const dispatchToServer = (action) => {
+const dispatchToOthers = (action) => {
     if (isInAgency('client')) {
         let dispatchProxy = DispatchProxy[0]
         dispatchProxy.call(null, action)
+    } else {
+        // so it appears to have come from us
+        delete action.meta.antares.connectionId
+        action.meta.originAgentId = Antares.agentId
+        remoteActions.next(action)
     }
 }
 
@@ -161,7 +167,7 @@ export const initializeStore = () => {
         return (action$, state) =>
             userEpic(action$, state)
                 .map(enhanceActionMeta)
-                .do(dispatchToServer)
+                .do(dispatchToOthers)
     })
 
     const rootEpic = combineEpics(...antaresEnhancedEpics)

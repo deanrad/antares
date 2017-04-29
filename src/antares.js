@@ -34,6 +34,8 @@ export const AntaresInit = (AntaresConfig) => {
 
     // Construct the store for this Agent!
     const store = initializeStore()
+    // Identify this instance of this JS process
+    const agentId = AntaresConfig.newId()
     // dispatcher is a location-unaware function to dispatch and return a Promise
     // Should accept an intent, and return a Promise for an ACK
     let dispatcher
@@ -90,7 +92,7 @@ export const AntaresInit = (AntaresConfig) => {
 
         // Provide the publication endpoint
         inAgencyRun('server', () => {
-            AntaresConfig.defineRemoteActionsProducer(store)
+            AntaresConfig.defineRemoteActionsProducer(store, agentId)
         })
 
         // Ensure we're listening for remoteActions and applying them to our store
@@ -213,6 +215,7 @@ export const AntaresInit = (AntaresConfig) => {
         subscribeRenderer,
         store,
         remoteAction$,
+        agentId,
         asteroid,
         getState: () => store.getState().antares,
         getViewState: () => store.getState().view,

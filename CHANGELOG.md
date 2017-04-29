@@ -35,3 +35,6 @@
 ### [0.3.17]
 * Added (immutable) combineReducers as an export
 
+### [0.3.18]
+* Each Agent has id, Antares.init sends parentAgentId
+* Fix for isAgency('server') detection for server epics
