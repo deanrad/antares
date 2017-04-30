@@ -1,6 +1,6 @@
 babel-compiler@6.18.1
 babel-runtime@1.0.1
-deanius:antares@0.3.18
+deanius:antares@0.3.19
 ecmascript@0.7.2
 ecmascript-runtime@0.3.15
 meteor@1.6.1
