@@ -29,7 +29,6 @@ export const defineDispatchEndpoint = (store) => {
         // record the connection this came in on (a default MetaEnhancer)
         if (!action.meta) action.meta = { antares: {} }
         action.meta.antares.connectionId = client && client.connection && client.connection.id
-
         let key = action.meta.antares.key
         let metaLog = {
             ...action.meta,
@@ -110,8 +109,8 @@ const defineRemoteActionsConsumer = () => {
 
     const action$ = DDPMessage.asObservable()
         .filter(msg => msg.collection === 'Antares.remoteActions')
+        // of the fields in the DDP payload, the 'fields' one contains the action
         .map(msg => msg.fields)
-
 
     return action$
 }

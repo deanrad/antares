@@ -38,3 +38,9 @@
 ### [0.3.18]
 * Each Agent has id, Antares.init sends parentAgentId
 * Fix for isAgency('server') detection for server epics
+
+### [0.3.19]
+* Refactored agentId implementation to use a prototype object
+* Antares.agentId and Antares.parentAgentId can be counted on!
+* Actions get labeled with meta.antares.originAgentId so we know from whence they came
+

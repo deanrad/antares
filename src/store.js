@@ -85,7 +85,7 @@ const dispatchToOthers = (action) => {
     } else {
         // so it appears to have come from us
         delete action.meta.antares.connectionId
-        action.meta.originAgentId = Antares.agentId
+        action.meta.antares.originAgentId = Antares.agentId
         remoteActions.next(action)
     }
 }

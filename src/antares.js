@@ -8,8 +8,9 @@ export { combineReducers } from 'redux-immutable'
 import { Agents, ReducerForKey, ViewReducer, MetaEnhancers, Epics, DispatchProxy, NewId, Types } from './config'
 import { enhanceActionMeta } from './action'
 import { initializeStore } from './store'
-import { inAgencyRun, isInAgency } from './agency'
+import { inAgencyRun, isInAgency, saveParentAgentId } from './agency'
 import { createClass as createAsteroid } from 'asteroid'
+import { AntaresProto } from './AntaresProto'
 export * from './agency'
 export * from './action'
 export * from './errors'
@@ -35,7 +36,7 @@ export const AntaresInit = (AntaresConfig) => {
     // Construct the store for this Agent!
     const store = initializeStore()
     // Identify this instance of this JS process
-    const agentId = AntaresConfig.newId()
+    AntaresProto.agentId = AntaresConfig.newId()
     // dispatcher is a location-unaware function to dispatch and return a Promise
     // Should accept an intent, and return a Promise for an ACK
     let dispatcher
@@ -92,7 +93,7 @@ export const AntaresInit = (AntaresConfig) => {
 
         // Provide the publication endpoint
         inAgencyRun('server', () => {
-            AntaresConfig.defineRemoteActionsProducer(store, agentId)
+            AntaresConfig.defineRemoteActionsProducer(store, AntaresProto.agentId)
         })
 
         // Ensure we're listening for remoteActions and applying them to our store
@@ -119,6 +120,8 @@ export const AntaresInit = (AntaresConfig) => {
             // Note - event emitter style ddp.on('added', cb) may be more appropriate than a
             // subscription that needs reattaching.
             remoteAction$.subscribe(action => store.dispatch(action))
+
+            saveParentAgentId(remoteAction$)
         })
     }
 
@@ -154,7 +157,7 @@ export const AntaresInit = (AntaresConfig) => {
         return stream.subscribe(observer)
     }
 
-    const Antares = {
+    const Antares = Object.assign(Object.create(AntaresProto), {
         originate: (actionCreatorOrType, payload, payloadEnhancer = (a => null), metaEnhancer = null) => {
             let action
             let stowaway = payloadEnhancer()
@@ -215,12 +218,11 @@ export const AntaresInit = (AntaresConfig) => {
         subscribeRenderer,
         store,
         remoteAction$,
-        agentId,
         asteroid,
         getState: () => store.getState().antares,
         getViewState: () => store.getState().view,
         Config: AntaresConfig
-    }
+    })
 
     console.info('Antares initialized.')
     return Antares
