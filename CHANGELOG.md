@@ -44,3 +44,5 @@
 * Antares.agentId and Antares.parentAgentId can be counted on!
 * Actions get labeled with meta.antares.originAgentId so we know from whence they came
 
+### [0.3.20]
+* Provide default (mediocre) agentId generator if none provided

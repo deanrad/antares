@@ -8,7 +8,9 @@ export const Agents = {
     client: () => !Agents.server()
 }
 export const Epics = {}
-export const NewId = []
+export const NewId = [
+    () => Math.floor(Math.random() * 100000)
+]
 export const ParentAgentId = []
 export const Types = {}
 export const ReducerForKey = []

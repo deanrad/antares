@@ -29,14 +29,17 @@ export const AntaresInit = (AntaresConfig) => {
     Object.assign(Epics, AntaresConfig.Epics)
     Object.assign(Types, AntaresConfig.Types)
     ViewReducer.push(AntaresConfig.ViewReducer || noopReducer)
-    NewId.push(AntaresConfig.newId)
+    if (AntaresConfig.newId) {
+        NewId.pop()
+        NewId.push(AntaresConfig.newId)
+    }
     ReducerForKey.push(AntaresConfig.ReducerForKey || noopReducer)
     MetaEnhancers.push(...(AntaresConfig.MetaEnhancers || []))
 
     // Construct the store for this Agent!
     const store = initializeStore()
     // Identify this instance of this JS process
-    AntaresProto.agentId = AntaresConfig.newId()
+    AntaresProto.agentId = NewId[0]()
     // dispatcher is a location-unaware function to dispatch and return a Promise
     // Should accept an intent, and return a Promise for an ACK
     let dispatcher
