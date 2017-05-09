@@ -46,3 +46,6 @@
 
 ### [0.3.20]
 * Provide default (mediocre) agentId generator if none provided
+
+### [0.3.21]
+* Bypass Meteor's Mergebox so memory doesn't retain each sent action

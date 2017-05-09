@@ -131,10 +131,10 @@ const createPublisher = (store, agentId) =>
                 if (sub) sub.unsubscribe()
             })
 
-            // To send over DDP, you call the added method, and pass a brand-new ID
-            // to ensure mergebox will not drop it
+            // To send over DDP, you call the sendAdded method, and pass a brand-new ID
+            // then bypass mergebox so memory doesn't fill up
             const sendToClient = action => {
-                client.added('Antares.remoteActions', newId(), action)
+                client._session.sendAdded('Antares.remoteActions', newId(), action)
             }
 
             const initAction = {
