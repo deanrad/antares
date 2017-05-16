@@ -49,3 +49,6 @@
 
 ### [0.3.21]
 * Bypass Meteor's Mergebox so memory doesn't retain each sent action
+
+### [0.3.22]
+* Simply use AntaresInit in Meteor, and it works (no need for AntaresMeteorInit)

@@ -4,8 +4,6 @@ import Rx from 'rxjs'
 
 import { default as Immutable, fromJS, Map as iMap, List as iList } from 'immutable'
 
-// allow consumers of the meteor package to skip having the npm dep as well
-export * from '../src/antares'
 import { mongoRendererFor } from './mongoRendererFor'
 import { DDPToStoreRendererFor } from './DDPToStoreRendererFor'
 import { remoteActions, getFilterFor } from './remoteActions'
@@ -278,3 +276,16 @@ export const AntaresMeteorInit = (antaresInit) => {
         return Antares
     }
 }
+
+// Export the identical interface as ../src/antares except AntaresInit
+// will be wrapped by AntaresMeteorInit
+import { AntaresInit as _init } from '../src/antares'
+export const AntaresInit = AntaresMeteorInit(_init)
+export * from '../src/agency'
+export * from '../src/action'
+export * from '../src/errors'
+export { default as Rx } from 'rxjs'
+export const { Observable } = Rx
+export { default as Immutable, fromJS, Map as iMap, List as iList } from 'immutable'
+export { createReducer } from 'redux-act'
+export { combineReducers } from 'redux-immutable'
