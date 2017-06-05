@@ -1,0 +1,13 @@
+babel-compiler@6.19.1
+babel-runtime@1.0.1
+deanius:antares@0.4.3
+ecmascript@0.8.0
+ecmascript-runtime@0.4.1
+ecmascript-runtime-client@0.4.1
+ecmascript-runtime-server@0.4.1
+meteor@1.6.1
+modules@0.9.0
+modules-runtime@0.8.0
+promise@0.8.9
+random@1.0.10
+underscore@1.0.10

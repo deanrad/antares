@@ -1,0 +1,80 @@
+{
+  "name": "antares-protocol",
+  "version": "0.4.3",
+  "description": "Antares defines a protocol and API for distributed awareness among streaming agents.",
+  "main": "dist/antares.js",
+  "scripts": {
+    "test": "gulp",
+    "lint": "gulp lint",
+    "test-browser": "gulp test-browser",
+    "watch": "gulp watch",
+    "build": "gulp build",
+    "prepublish": "gulp build",
+    "coverage": "gulp coverage"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/deanius/antares.git"
+  },
+  "keywords": [],
+  "author": "Dean Radcliffe <dean+antares@deanius.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/deanius/antares/issues"
+  },
+  "homepage": "https://github.com/deanius/antares",
+  "dependencies": {
+    "asteroid": "^2.0.3",
+    "babel-core": "^6.23.0",
+    "babel-loader": "^6.2.10",
+    "babel-runtime": "^6.23.0",
+    "immutable": "^3.8.1",
+    "immutablediff": "^0.4.4",
+    "mongodb-diff": "^0.4.3",
+    "redux": "^3.6.0",
+    "redux-act": "^1.1.0",
+    "redux-immutable": "^4.0.0",
+    "redux-observable": "^0.13.0",
+    "rxjs": "^5.2.0"
+  },
+  "devDependencies": {
+    "babel-core": "6.x",
+    "babel-loader": "6.x",
+    "babel-plugin-transform-object-rest-spread": "6.x",
+    "babel-polyfill": "6.x",
+    "babel-preset-latest": "6.x",
+    "babel-register": "6.x",
+    "bluebird": "^3.5.0",
+    "chai": "3.5.0",
+    "chai-as-promised": "^6.0.0",
+    "chai-subset": "^1.5.0",
+    "del": "2.2.2",
+    "git-hooks": "^1.1.8",
+    "glob": "7.0.6",
+    "gulp": "3.9.1",
+    "gulp-eslint": "3.0.1",
+    "gulp-filter": "4.0.0",
+    "gulp-istanbul": "1.1.1",
+    "gulp-livereload": "3.8.1",
+    "gulp-load-plugins": "1.2.4",
+    "gulp-mocha": "3.0.1",
+    "gulp-plumber": "1.1.0",
+    "gulp-rename": "1.2.2",
+    "gulp-sourcemaps": "2.x",
+    "gulp-uglify": "2.0.0",
+    "isparta": "4.0.0",
+    "json-loader": "0.5.4",
+    "mocha": "3.x",
+    "object.values": "1.x",
+    "redux": "^3.6.0",
+    "redux-observable": "^0.12.2",
+    "sinon": "^1.17.5",
+    "sinon-chai": "^2.8.0",
+    "webpack": "1.x",
+    "webpack-stream": "3.x"
+  },
+  "babelBoilerplateOptions": {
+    "entryFileName": "antares.js",
+    "mainVarName": "antares"
+  }
+}
