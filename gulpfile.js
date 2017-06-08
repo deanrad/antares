@@ -86,7 +86,9 @@ function _mocha() {
     .pipe($.mocha({
       reporter: 'spec',
       globals: Object.keys(mochaGlobals.globals),
-      ignoreLeaks: false
+      ignoreLeaks: false,
+      // never check in with your grep options!
+      // grep: 'fetch'
     }));
 }
 

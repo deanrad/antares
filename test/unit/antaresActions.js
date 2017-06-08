@@ -17,11 +17,21 @@ const failIfNotRejected = fulfilledValue => {
 
 describe('Antares Actions', () => {
   let Antares
+  let randomObject
+  let randomSimpleKey
+  let randomKeyArray
+
   before(() => {
     Antares = AntaresInit({
       ...minimalConfig,
       notifyParentAgent: action => Promise.resolve(action)
     })
+  })
+  beforeEach(() => {
+    // could obviously be generated :)
+    randomObject = { nested: { stuff: 'cool' } }
+    randomSimpleKey = 'e875'
+    randomKeyArray = ['documents', randomSimpleKey]
   })
 
   describe('Antares.init', () => {
@@ -83,17 +93,6 @@ describe('Antares Actions', () => {
   })
 
   describe('Antares.store', () => {
-    let randomObject
-    let randomSimpleKey
-    let randomKeyArray
-
-    beforeEach(() => {
-      // could obviously be generated :)
-      randomObject = { nested: { stuff: 'cool' } }
-      randomSimpleKey = 'e875'
-      randomKeyArray = ['documents', randomSimpleKey]
-    })
-
     describe('simple key', () => {
       it('should place the payload into the store at the given key', () => {
         let announcementPromise = Antares.announce({
@@ -120,6 +119,45 @@ describe('Antares Actions', () => {
           randomObject
         )
         return announcementPromise
+      })
+    })
+  })
+
+  describe('Antares.fetch', () => {
+    let Antares
+    before(() => {
+      Antares = AntaresInit({
+        ...minimalConfig,
+        onKeyNotDefined: key => {
+          if (key[0] === 'forceError') {
+            throw new Error()
+          } else {
+            return randomObject
+          }
+        }
+      })
+    })
+
+    describe('without a value present at that key', () => {
+      it('should populate the store with the synchronous return value of the onKeyNotDefined function', () => {
+        expect(Antares.getState().get('notFound')).to.not.be.defined
+        let announcementPromise = Antares.announce({
+          type: 'Antares.fetch',
+          meta: { antares: { key: 'notFound' } }
+        })
+        let storedValue = Antares.getState().get('notFound')
+        expect(storedValue).to.be.ok
+        expect(storedValue.toJS()).to.deep.eql(randomObject)
+        return announcementPromise
+      })
+
+      it('should become a rejected promise if key lookup fails', () => {
+        let announcementPromise = Antares.announce({
+          type: 'Antares.fetch',
+          meta: { antares: { key: ['forceError'] } }
+        })
+
+        return expect(announcementPromise).to.be.rejected
       })
     })
   })

@@ -62,9 +62,10 @@ export const AntaresInit = AntaresConfig => {
   }
 
   const ReducerForKey = AntaresConfig.ReducerForKey || (key => noopReducer)
+  const onKeyNotDefined = AntaresConfig.onKeyNotDefined || (() => null)
 
   // Construct the store for this Agent!
-  const store = initializeStore({ ReducerForKey })
+  const store = initializeStore({ ReducerForKey, onKeyNotDefined })
 
   // Identify this instance of this JS process
   const agentId = AntaresConfig.agentId || NewId[0]()

@@ -8,11 +8,11 @@ import { diff as mongoDiffer } from 'mongodb-diff'
 import Rx from 'rxjs/Rx'
 import { Epics, ViewReducer, DispatchProxy, NewId } from './config'
 import { inAgencyRun, isInAgency } from './agency'
-import { AntaresError } from './errors'
+import { KeyLookupFailed } from './errors'
 import { enhanceActionMeta } from './action'
 
 // handles storing, updating, and removing
-export const antaresReducer = ({ ReducerForKey }) => (state, action) => {
+export const antaresReducer = ({ ReducerForKey, onKeyNotDefined }) => (state, action) => {
   if (!state) return new iMap()
 
   // these are up to the client to manage - we perform no change
@@ -34,28 +34,32 @@ export const antaresReducer = ({ ReducerForKey }) => (state, action) => {
     return state.setIn(keyPath, fromJS(payload))
   }
 
+  // used for cache pre-warming. Throws KeyLookupFailed if the onKeyNotDefined function fails
+  if (type === 'Antares.fetch') {
+    if (state.getIn(providedKeyPath) !== undefined) {
+      return state
+    }
+    try {
+      let value = onKeyNotDefined(providedKeyPath)
+      return state.setIn(providedKeyPath, fromJS(value))
+    } catch (ex) {
+      throw new KeyLookupFailed(ex)
+    }
+  }
+
   if (type === 'Antares.forget') {
     return state.deleteIn(providedKeyPath)
   }
 
   // An antares or other update which should target a specific key
   if (type === 'Antares.update' || providedKey) {
-    // Gracefully ignore if we don't know how to apply this message
-    // if (!state.hasIn(providedKeyPath)) {
-    //   console.info(
-    //     `Antares.update: Store has no value at ${providedKeyPath}:
-    //                               ${JSON.stringify(action, null, 2)}`
-    //   )
-    //   return state
-    // }
+    // Try to populate it
+    if (!state.hasIn(providedKeyPath)) {
+        state.setIn(providedKeyPath, fromJS(onKeyNotDefined(providedKeyPath)))
+    }
 
     let reducer = ReducerForKey(providedKey)
-
-    if (!state.hasIn(providedKeyPath)) {
-      return state.setIn(providedKeyPath, reducer(undefined, action))
-    } else {
-      return state.updateIn(providedKeyPath, state => reducer(state, action))
-    }
+    return state.updateIn(providedKeyPath, state => reducer(state, action))
   }
 
   if (type === 'Antares.init') {
@@ -167,7 +171,7 @@ const diffMiddleware = ({
   antaresDiff$.next({ action, iDiff, mongoDiff })
 }
 
-export const initializeStore = ({ ReducerForKey }) => {
+export const initializeStore = ({ ReducerForKey, onKeyNotDefined }) => {
   // the keys are only for documentation purposes now
   const userEpics = Object.values(Epics)
   const antaresDiff$ = new Rx.Subject()
@@ -188,7 +192,7 @@ export const initializeStore = ({ ReducerForKey }) => {
 
   const viewReducer = ViewReducer[0]
   const rootReducer = combineReducers({
-    antares: antaresReducer({ ReducerForKey }),
+    antares: antaresReducer({ ReducerForKey, onKeyNotDefined }),
     view: viewReducer
   })
 
