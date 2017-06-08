@@ -60,7 +60,7 @@ export const antaresReducer = ({ ReducerForKey }) => (state, action) => {
 
   if (type === 'Antares.init') {
     // don't double-init if we resubscribe to remoteActions with a different criteria
-    return state.size == 0 ? fromJS(action.payload) : state
+    return state.size == 0 ? fromJS(action.payload || {}) : state
   }
 
   return state
