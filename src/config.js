@@ -9,7 +9,7 @@ export const Agents = {
   client: () => !Agents.server()
 }
 export const Epics = {}
-export const NewId = [() => Math.floor(Math.random() * 100000)]
+export const NewId = [() => Math.floor(Math.random() * 10000000).toString(16)]
 export const ParentAgentId = []
 export const Types = {}
 export const ReducerForKey = []
@@ -19,7 +19,7 @@ export const MetaEnhancers = [
   iAction =>
     (iAction.getIn(['meta', 'antares', 'actionId'])
       ? {}
-      : { actionId: Math.floor(Math.random() * 10000) }),
+      : { actionId: Math.floor(Math.random() * 10000000).toString(16) }),
   (_, Antares) => ({ originAgentId: Antares.agentId })
 ]
 export const DispatchProxy = []
