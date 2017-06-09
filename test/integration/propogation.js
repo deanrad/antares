@@ -36,7 +36,11 @@ describe('Client Server Topology', () => {
     let testActionsConsumer = agentId => antaresDispatcher =>
       server.action$
         .map(({ action }) => action)
-        .filter(action => action.meta.antares.originAgentId !== agentId)
+        .filter(
+          action =>
+            action.meta.antares.originAgentId !== agentId ||
+            action.meta.antares.reflectAction
+        )
 
     let clientConfig = {
       ...minimalConfig,
@@ -112,6 +116,28 @@ describe('Client Server Topology', () => {
               JSON.stringify(clientSelfActions)
             ).to.have.property('length', 1)
           })
+      })
+
+      it('Will come back to the sender if reflectAction:true', () => {
+        let testAction = {
+          type: 'Test.action',
+          meta: { antares: { actionId: 'e231', reflectAction: true } }
+        }
+
+        // Assert that the originating agent sees actions in its store synchronously
+        let clientSelfActions = []
+        let clientSelfSub = clientSelf.action$.subscribe(({ action }) => {
+          clientSelfActions.push(action)
+        })
+
+        return clientSelf
+          .announce(testAction)
+          .then(() =>
+            expect(
+              clientSelfActions,
+              JSON.stringify(clientSelfActions)
+            ).to.have.length(2)
+          )
       })
     })
 
