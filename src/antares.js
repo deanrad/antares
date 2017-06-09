@@ -21,7 +21,6 @@ import {
   Agents,
   ViewReducer,
   MetaEnhancers,
-  Epics,
   DispatchProxy,
   NewId,
   Types
@@ -51,7 +50,6 @@ export const AntaresInit = AntaresConfig => {
 
   // Store provided config fields
   Object.assign(Agents, AntaresConfig.Agents)
-  Object.assign(Epics, AntaresConfig.Epics)
   Object.assign(Types, AntaresConfig.Types)
   ViewReducer.push(AntaresConfig.ViewReducer || noopReducer)
   MetaEnhancers.push(...(AntaresConfig.MetaEnhancers || []))
@@ -63,9 +61,10 @@ export const AntaresInit = AntaresConfig => {
 
   const ReducerForKey = AntaresConfig.ReducerForKey || (key => noopReducer)
   const onKeyNotDefined = AntaresConfig.onKeyNotDefined || (() => null)
+  const Epics = AntaresConfig.Epics || {}
 
   // Construct the store for this Agent!
-  const store = initializeStore({ ReducerForKey, onKeyNotDefined })
+  const store = initializeStore({ ReducerForKey, onKeyNotDefined, Epics })
 
   // Identify this instance of this JS process
   const agentId = AntaresConfig.agentId || NewId[0]()

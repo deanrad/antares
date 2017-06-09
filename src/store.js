@@ -6,7 +6,7 @@ import { fromJS, Map as iMap } from 'immutable'
 import iDiffer from 'immutablediff'
 import { diff as mongoDiffer } from 'mongodb-diff'
 import Rx from 'rxjs/Rx'
-import { Epics, ViewReducer, DispatchProxy, NewId } from './config'
+import { ViewReducer, DispatchProxy, NewId } from './config'
 import { inAgencyRun, isInAgency } from './agency'
 import { KeyLookupFailed } from './errors'
 import { enhanceActionMeta } from './action'
@@ -171,8 +171,8 @@ const diffMiddleware = ({
   antaresDiff$.next({ action, iDiff, mongoDiff })
 }
 
-export const initializeStore = ({ ReducerForKey, onKeyNotDefined }) => {
-  // the keys are only for documentation purposes now
+export const initializeStore = ({ ReducerForKey, onKeyNotDefined, Epics }) => {
+  // the keys of Epics are only for documentation purposes now
   const userEpics = Object.values(Epics)
   const antaresDiff$ = new Rx.Subject()
   const viewDiff$ = new Rx.Subject()
@@ -180,14 +180,16 @@ export const initializeStore = ({ ReducerForKey, onKeyNotDefined }) => {
   const middlewares = [diffMiddleware({ antaresDiff$, viewDiff$ })]
   if (userEpics) {
     // To each userEpic we append our own behaviors
-    const antaresEnhancedEpics = userEpics.map(userEpic => {
-      return (action$, state) =>
-        userEpic(action$, state).map(enhanceActionMeta).do(dispatchToOthers)
-    })
+    const antaresEnhancedEpics = userEpics
+    // LEFTOFF antares enhancing epics
+    //   .map(userEpic => {
+    //   return (action$, state) =>
+    //     userEpic(action$, state).map(enhanceActionMeta).do(dispatchToOthers)
+    // })
 
     const rootEpic = combineEpics(...antaresEnhancedEpics)
     const epicMiddleware = createEpicMiddleware(rootEpic)
-//    middlewares.unshift(epicMiddleware)
+    middlewares.unshift(epicMiddleware)
   }
 
   const viewReducer = ViewReducer[0]
