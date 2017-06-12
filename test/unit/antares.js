@@ -162,4 +162,13 @@ describe('Antares Instance', () => {
       })
     })
   })
+
+  describe('#process', () => {
+    it('makes the action localOnly, then announces it', () => {
+      const Antares = AntaresInit({ ...config, agentId: '39a3' })
+      let action = { type: 'Secret', payload: {} }
+      Antares.process(action)
+      expect(action.meta.antares).to.have.property('localOnly', true)
+    })
+  })
 })

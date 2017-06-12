@@ -135,30 +135,33 @@ export const AntaresInit = AntaresConfig => {
 
   const subscribeRenderer = (renderer, opts, alternateStream) => {
     // default to sync mode
-    const { mode, xform } = opts || { mode: 'sync' }
+    // About RXJS5 schedulers: https://github.com/ReactiveX/rxjs/blob/master/doc/scheduler.md
+    const { mode, xform, filter } = opts || { mode: 'sync' }
 
-    // a stream transformer for diffs (in lieu of providing an alternateStream)
+    // diff stream modifiers
+    const filterer = filter ? filter : () => true
     const modifier = xform ? xform : same => same
-    const _stream = alternateStream ? alternateStream : modifier(store.diff$)
+
+    // or provide an alternate stream
+    const actionStream = alternateStream
+      ? alternateStream
+      : modifier(store.diff$.filter(filterer))
 
     // The final stream we subscribe to with scheduling
-    const observe = mode === 'async'
-      ? s => s.observeOn(Rx.Scheduler.asap)
-      : s => s
-    const stream = observe(_stream)
+    const scheduledStream = mode === 'async'
+      ? actionStream.observeOn(Rx.Scheduler.asap)
+      : actionStream
     const defer = typeof setImmediate === 'function'
       ? setImmediate
       : fn => setTimeout(fn, 0)
 
-    // NOTE: A stream will resubscribe in case of error, but the handle will be of no use to call unsubscribe on it
-    // because we're subscribed on a new handle now. The fix would be to return a handle-getting function. Messy?
     const observer = {
       next: action => {
         try {
           return renderer(action)
         } catch (ex) {
           // reestablish our subscription in the next turn of the event loop
-          defer(() => stream.subscribe(observer))
+          defer(() => scheduledStream.subscribe(observer))
           // but let our caller see
           throw ex
         }
@@ -166,7 +169,7 @@ export const AntaresInit = AntaresConfig => {
       error: e => console.warn('SR> saw error', e),
       complete: e => console.warn('SR> done')
     }
-    return stream.subscribe(observer)
+    return scheduledStream.subscribe(observer)
   }
 
   const saveParentAgentId = store.diff$
@@ -210,6 +213,7 @@ export const AntaresInit = AntaresConfig => {
     return enhancedAction
   }
 
+  // TODO simplify this interface!
   const announce = (
     actionCreatorOrType,
     payload,
@@ -252,9 +256,19 @@ export const AntaresInit = AntaresConfig => {
     })
   }
 
+  // goes through the announce pipeline, but with localOnly flag set so its not shared with other agents
+  const process = action => {
+    action.meta = action.meta || {}
+    action.meta.antares = action.meta.antares || {}
+    action.meta.antares.localOnly = true
+
+    announce(action)
+  }
+
   Object.assign(Antares, {
     originate,
     announce,
+    process,
     agentId,
     subscribe: filter => {
       // TODO provide subscription tracking functions
