@@ -98,6 +98,16 @@ const dispatchToOthers = action => {
   }
 }
 
+const getUpdateOp = (before, after) => {
+  try {
+    return (before &&
+        after &&
+        mongoDiffer(before.toJS(), after.toJS())) || {}
+  } catch (ex) {
+    return {}
+  }
+}
+
 // emits a stream of diff$ (paired with the actions that caused them and the resulting state)
 // resulting from the stream of Actions (including those consequences from Epics)
 // that have hit this store. It should be attached after epicMiddleware in the mw chain.
@@ -152,9 +162,7 @@ const diffMiddleware = ({
       collection,
       id,
       update: true,
-      updateOp: (before &&
-        after &&
-        mongoDiffer(before.toJS(), after.toJS())) || {}
+      updateOp: getUpdateOp(before, after)
     }
   }
 

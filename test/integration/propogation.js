@@ -104,7 +104,6 @@ describe('Client Server Topology', () => {
           .then(() => firstServerAction)
           .then(serverAction => {
             expect(serverAction).to.containSubset(testAction)
-            // this.skip() // not received by other until pub/sub mocked out
           })
           .then(() => firstOtherAction)
           .then(otherAction => {
@@ -174,7 +173,6 @@ describe('Client Server Topology', () => {
           .then(() => firstClientSelfAction)
           .then(clientAction => {
             expect(clientAction).to.containSubset(testAction)
-            // this.skip() // not received by other until pub/sub mocked out
           })
           .then(() => firstClientOtherAction)
           .then(clientAction => {

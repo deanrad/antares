@@ -72,7 +72,7 @@ describe('Antares Instance', () => {
       },
       iListPush: (state = new iList(), payload) => {
         reductionCount = reductionCount + 1
-        return state.push(payload)
+        return state.push(fromJS(payload))
       }
     }
     const ReducerForKey = key => reducers[key] || reducers.iListPush
@@ -107,22 +107,18 @@ describe('Antares Instance', () => {
 
         expect(reductionCount).to.eq(1)
         // let mocha catch if we return a rejected promise
-        return announcementPromise
+        return expect(announcementPromise).to.be.fulfilled
       })
 
       it('should call the notifyParentAgent function after a successful dispatch', function() {
-        this.skip()
-
         let announcementPromise = Antares.announce({
           type: 'ping',
           payload: { '200': 'OK' },
           meta: { antares: { key: '200' } }
         }).then(() => {
-
-          // expect(parentNotifyCount).to.equal(1)
-          // return expect(announcementPromise).to.be.fulfilled
+          expect(parentNotifyCount).to.equal(1)
         })
-        return announcementPromise
+        return expect(announcementPromise).to.be.fulfilled
       })
 
       describe('Error reducing action into store', () => {
