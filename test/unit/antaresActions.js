@@ -123,6 +123,15 @@ describe('Antares Actions', () => {
     })
   })
 
+  describe('Antares.update', () => {
+    describe('item present at key', () => {
+      it('should run the reducer on that item')
+    })
+    describe('item not present at key', () => {
+      it('should run the onKeyNotDefined function to populate it, then run the reducer')
+    })
+  })
+
   describe('Antares.fetch', () => {
     let Antares
     before(() => {

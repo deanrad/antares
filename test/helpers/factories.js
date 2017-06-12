@@ -8,8 +8,6 @@ chai.use(chaiSubset)
 chai.use(chaiAsPromised)
 
 export const minimalConfig = {
-    client: () => true,
-    defineDispatchEndpoint: () => null,
-    defineRemoteActionsProducer: () => null,
+    // silences the message 'No way to notify parent of action'
     notifyParentAgent: action => Promise.resolve(action)
 }
