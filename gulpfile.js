@@ -88,7 +88,7 @@ function _mocha() {
       globals: Object.keys(mochaGlobals.globals),
       ignoreLeaks: false,
       // never check in with your grep options!
-      // grep: 'fetch'
+      // grep: 'renderer exceptions'
     }));
 }
 

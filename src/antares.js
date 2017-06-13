@@ -36,7 +36,8 @@ export * from './errors'
 import {
   ReductionError,
   TypeValidationError,
-  ParentNotificationError
+  ParentNotificationError,
+  RenderError
 } from './errors'
 
 // Allow the caller to initialize us, extending their config onto ours
@@ -124,7 +125,11 @@ export const AntaresInit = AntaresConfig => {
         store.dispatch(action)
         resolve(action)
       } catch (ex) {
-        reject(new ReductionError(ex))
+        if (ex instanceof RenderError) {
+          reject(ex)
+        } else {
+          reject(new ReductionError(ex))
+        }
       }
     }).then(action => {
       return notifyParentAgent(action).catch(ex => {
@@ -133,37 +138,49 @@ export const AntaresInit = AntaresConfig => {
     })
   }
 
-  const subscribeRenderer = (renderer, opts, alternateStream) => {
-    // default to sync mode
-    // About RXJS5 schedulers: https://github.com/ReactiveX/rxjs/blob/master/doc/scheduler.md
-    const { mode, xform, filter } = opts || { mode: 'sync' }
+  // in order subscribed
+  let allRenderersCount = 0
 
-    // diff stream modifiers
-    const filterer = filter ? filter : () => true
-    const modifier = xform ? xform : same => same
+  const subscribeRenderer = (
+    renderer = () => {},
+    opts = {},
+    alternateStream
+  ) => {
+    const {
+      mode = 'sync',
+      xform = same => same,
+      filter = () => true,
+      actionStreamKey = `renderer[${allRenderersCount}]`
+    } = opts
+
+    allRenderersCount += 1
 
     // or provide an alternate stream
     const actionStream = alternateStream
       ? alternateStream
-      : modifier(store.diff$.filter(filterer))
+      : xform(store.diff$.filter(filter))
 
     // The final stream we subscribe to with scheduling
+    // About RXJS5 schedulers: https://github.com/ReactiveX/rxjs/blob/master/doc/scheduler.md
     const scheduledStream = mode === 'async'
       ? actionStream.observeOn(Rx.Scheduler.asap)
       : actionStream
-    const defer = typeof setImmediate === 'function'
-      ? setImmediate
-      : fn => setTimeout(fn, 0)
+
+    // This turns out to a great way to defer - it puts an item on
+    // the microtask queue, executing ASAP in most cases
+    // See https://jakearchibald.com/2015/tasks-microtasks-queues-and-schedules/
+    const defer = fn => Promise.resolve().then(fn)
 
     const observer = {
-      next: action => {
+      next: streamItem => {
         try {
-          return renderer(action)
+          let retVal = renderer(streamItem)
+          // TODO in sync mode, await a promise, or whatever it is
+          streamItem[actionStreamKey] = retVal
         } catch (ex) {
           // reestablish our subscription in the next turn of the event loop
           defer(() => scheduledStream.subscribe(observer))
-          // but let our caller see
-          throw ex
+          throw new RenderError(ex)
         }
       },
       error: e => console.warn('SR> saw error', e),
@@ -262,7 +279,7 @@ export const AntaresInit = AntaresConfig => {
     action.meta.antares = action.meta.antares || {}
     action.meta.antares.localOnly = true
 
-    announce(action)
+    return announce(action)
   }
 
   Object.assign(Antares, {
