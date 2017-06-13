@@ -12,7 +12,10 @@ import { KeyLookupFailed } from './errors'
 import { enhanceActionMeta } from './action'
 
 // handles storing, updating, and removing
-export const antaresReducer = ({ ReducerForKey, onKeyNotDefined }) => (state, action) => {
+export const antaresReducer = ({ ReducerForKey, onKeyNotDefined }) => (
+  state,
+  action
+) => {
   if (!state) return new iMap()
 
   // these are up to the client to manage - we perform no change
@@ -55,7 +58,7 @@ export const antaresReducer = ({ ReducerForKey, onKeyNotDefined }) => (state, ac
   if (type === 'Antares.update' || providedKey) {
     // Try to populate it
     if (!state.hasIn(providedKeyPath)) {
-        state.setIn(providedKeyPath, fromJS(onKeyNotDefined(providedKeyPath)))
+      state.setIn(providedKeyPath, fromJS(onKeyNotDefined(providedKeyPath)))
     }
 
     let reducer = ReducerForKey(providedKey)
@@ -100,9 +103,7 @@ const dispatchToOthers = action => {
 
 const getUpdateOp = (before, after) => {
   try {
-    return (before &&
-        after &&
-        mongoDiffer(before.toJS(), after.toJS())) || {}
+    return (before && after && mongoDiffer(before.toJS(), after.toJS())) || {}
   } catch (ex) {
     return {}
   }
@@ -179,7 +180,13 @@ const diffMiddleware = ({
   antaresDiff$.next({ action, iDiff, mongoDiff })
 }
 
-export const initializeStore = ({ ReducerForKey, onKeyNotDefined, Epics }) => {
+export const initializeStore = ({
+  ReducerForKey,
+  onKeyNotDefined,
+  Epics,
+  agentId,
+  notifyParentAgent
+}) => {
   // the keys of Epics are only for documentation purposes now
   const userEpics = Object.values(Epics)
   const antaresDiff$ = new Rx.Subject()
@@ -189,11 +196,12 @@ export const initializeStore = ({ ReducerForKey, onKeyNotDefined, Epics }) => {
   if (userEpics) {
     // To each userEpic we append our own behaviors
     const antaresEnhancedEpics = userEpics
-    // LEFTOFF antares enhancing epics
-    //   .map(userEpic => {
-    //   return (action$, state) =>
-    //     userEpic(action$, state).map(enhanceActionMeta).do(dispatchToOthers)
-    // })
+      .map(userEpic => {
+        return (action$, state) =>
+          userEpic(action$, state).map(action =>
+            enhanceActionMeta(action, null, { agentId })
+          ).do(notifyParentAgent)
+      })
 
     const rootEpic = combineEpics(...antaresEnhancedEpics)
     const epicMiddleware = createEpicMiddleware(rootEpic)

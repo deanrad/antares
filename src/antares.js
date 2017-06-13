@@ -64,9 +64,6 @@ export const AntaresInit = AntaresConfig => {
   const onKeyNotDefined = AntaresConfig.onKeyNotDefined || (() => null)
   const Epics = AntaresConfig.Epics || {}
 
-  // Construct the store for this Agent!
-  const store = initializeStore({ ReducerForKey, onKeyNotDefined, Epics })
-
   // Identify this instance of this JS process
   const agentId = AntaresConfig.agentId || NewId[0]()
 
@@ -84,6 +81,9 @@ export const AntaresInit = AntaresConfig => {
     }
     return notifier(action)
   }
+
+  // Construct the store for this Agent!
+  const store = initializeStore({ ReducerForKey, onKeyNotDefined, Epics, agentId, notifyParentAgent })
 
   // defineDispatchEndpoint
   if (AntaresConfig.defineDispatchEndpoint) {
