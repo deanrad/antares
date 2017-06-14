@@ -1,6 +1,6 @@
 babel-compiler@6.19.1
 babel-runtime@1.0.1
-deanius:antares@0.4.3
+deanius:antares@0.4.4
 ecmascript@0.8.0
 ecmascript-runtime@0.4.1
 ecmascript-runtime-client@0.4.1
