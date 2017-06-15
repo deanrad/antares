@@ -43,7 +43,7 @@ export const antaresPublisher = ({ server, client, pubFilter }) => {
   let { action$, agentId, store } = server
 
   logger.log(
-    `AP> got subscriber ${client.connectionId}: ${JSON.stringify(pubFilter)}`,
+    `AP (${client.connectionId.substring(0,6)})> sub:   ${JSON.stringify(pubFilter)}`,
     { newSection: true }
   )
 
@@ -82,7 +82,7 @@ export const antaresPublisher = ({ server, client, pubFilter }) => {
       .filter(action => !action.meta.antares.localOnly)
       .filter(getFilterFor(pubFilter))
       .do(action =>
-        logger.debug(`Sending ${action.type} to ${client.connectionId}`, {
+        logger.debug(`Sending ${action.type} to connectionId:${client.connectionId.substring(0,6)}`, {
           prefix: `AP (${action.meta.antares.actionId})`
         })
       )

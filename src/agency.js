@@ -5,6 +5,7 @@ export const isInAgency = (agencyType) => {
     return runOnThisAgent()
 }
 
-export const inAgencyRun = (agencyType, fn) => {
+export const inAgencyRun = (givenType, fn) => {
+    const agencyType = givenType === '*' ? 'any' : givenType
     isInAgency(agencyType) && fn.call(this || global)
 }

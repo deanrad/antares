@@ -120,7 +120,7 @@ const defineRemoteActionsProducer = (store, agentId) => {
     })
 
     this.onStop(() => {
-      logger.log(`AP> ddp subscriber ${client.connectionId} signed off`)
+      logger.log(`AP (${client.connectionId.substring(0,6)})> unsub: ${JSON.stringify(pubFilter)}`)
       clientSub.unsubscribe()
     })
 
