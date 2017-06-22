@@ -8,8 +8,10 @@ import { ReductionError } from './errors'
 // The publication of the dispatched, and consequent actions is done by a final middleware
 // that runs after the epic middleware to ensure that every listener potentially can hear
 export const dispatchEndpoint = store => action => {
-
-  logger.log(action, {prefix: `AD (${action.meta.antares.actionId})`, xform: ppAction})
+  logger.log(
+    { type: action.type, local: action.meta.antares.localOnly },
+    { prefix: `AE (${action.meta.antares.actionId})` }
+  )
 
   // Now attempt to dispatch the action to the local store.
   // Any renderers that have been attached synchronously will run in the order subscribed.
@@ -18,11 +20,9 @@ export const dispatchEndpoint = store => action => {
   try {
     store.dispatch(action)
   } catch (ex) {
-    logger.log(
-      `AD Reduction Error (${action.meta.antares.actionId})> `,
-      ex.message,
-      ex.stack
-    )
+    logger.log(ex, {
+      prefix: `AD Reduction Error (${action.meta.antares.actionId})`
+    })
     throw new ReductionError(ex)
   }
 

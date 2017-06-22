@@ -6,8 +6,7 @@ import {
   fromJS,
   iList,
   ReductionError,
-  TypeValidationError,
-  ParentNotificationError
+  TypeValidationError
 } from '../../src/antares'
 import { minimalConfig } from '../helpers/factories'
 
@@ -73,20 +72,20 @@ describe('Antares Actions', () => {
       return announcementPromise
     })
 
-    it('should not overwrite the store if recieved a second time', () => {
+    it('should overwrite the store if recieved a second time', () => {
       let announcementPromise = Antares.announce({
         type: 'Antares.init',
-        payload: { dont: 'lose me!' },
+        payload: { ima: 'gonerrr' },
         meta: { antares: { parentAgentId: '8fed' } }
       })
-      expect(Antares.getState().toJS()).to.deep.eql({ dont: 'lose me!' })
+      expect(Antares.getState().toJS()).to.deep.eql({ ima: 'gonerrr' })
 
       announcementPromise = Antares.announce({
         type: 'Antares.init',
-        payload: {},
+        payload: {shinyAnd: 'new'},
         meta: { antares: { parentAgentId: '8fed' } }
       })
-      expect(Antares.getState().toJS()).to.deep.eql({ dont: 'lose me!' })
+      expect(Antares.getState().toJS()).to.deep.eql({shinyAnd: 'new'})
 
       return announcementPromise
     })
@@ -128,7 +127,7 @@ describe('Antares Actions', () => {
       it('should run the reducer on that item')
     })
     describe('item not present at key', () => {
-      it('should run the onKeyNotDefined function to populate it, then run the reducer')
+      it('should run the onCacheMiss function to populate it, then run the reducer')
     })
   })
 
@@ -137,7 +136,7 @@ describe('Antares Actions', () => {
     before(() => {
       Antares = AntaresInit({
         ...minimalConfig,
-        onKeyNotDefined: key => {
+        onCacheMiss: key => {
           if (key[0] === 'forceError') {
             throw new Error()
           } else {
@@ -148,7 +147,7 @@ describe('Antares Actions', () => {
     })
 
     describe('without a value present at that key', () => {
-      it('should populate the store with the synchronous return value of the onKeyNotDefined function', () => {
+      it('should populate the store with the synchronous return value of the onCacheMiss function', () => {
         expect(Antares.getState().get('notFound')).to.not.be.defined
         let announcementPromise = Antares.announce({
           type: 'Antares.fetch',

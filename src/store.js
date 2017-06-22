@@ -10,9 +10,10 @@ import { ViewReducer, DispatchProxy, NewId } from './config'
 import { inAgencyRun, isInAgency } from './agency'
 import { KeyLookupFailed } from './errors'
 import { enhanceActionMeta } from './action'
+import { logger, ppAction } from './logger'
 
 // handles storing, updating, and removing
-export const antaresReducer = ({ ReducerForKey, onKeyNotDefined }) => (
+export const antaresReducer = ({ ReducerForKey, onCacheMiss }) => (
   state,
   action
 ) => {
@@ -37,13 +38,13 @@ export const antaresReducer = ({ ReducerForKey, onKeyNotDefined }) => (
     return state.setIn(keyPath, fromJS(payload))
   }
 
-  // used for cache pre-warming. Throws KeyLookupFailed if the onKeyNotDefined function fails
+  // used for cache pre-warming. Throws KeyLookupFailed if the onCacheMiss function fails
   if (type === 'Antares.fetch') {
     if (state.getIn(providedKeyPath) !== undefined) {
       return state
     }
     try {
-      let value = onKeyNotDefined(providedKeyPath)
+      let value = onCacheMiss(providedKeyPath)
       return state.setIn(providedKeyPath, fromJS(value))
     } catch (ex) {
       throw new KeyLookupFailed(ex)
@@ -58,7 +59,7 @@ export const antaresReducer = ({ ReducerForKey, onKeyNotDefined }) => (
   if (type === 'Antares.update' || providedKey) {
     // Try to populate it
     if (!state.hasIn(providedKeyPath)) {
-      state.setIn(providedKeyPath, fromJS(onKeyNotDefined(providedKeyPath)))
+      state.setIn(providedKeyPath, fromJS(onCacheMiss(providedKeyPath)))
     }
 
     let reducer = ReducerForKey(providedKey)
@@ -66,8 +67,8 @@ export const antaresReducer = ({ ReducerForKey, onKeyNotDefined }) => (
   }
 
   if (type === 'Antares.init') {
-    // don't double-init if we resubscribe to remoteActions with a different criteria
-    return state.size == 0 ? fromJS(action.payload || {}) : state
+    // clean-slate the entire store
+    return fromJS(action.payload || {})
   }
 
   return state
@@ -89,18 +90,6 @@ const makeStoreFromReducer = (reducer, middleware) => {
   return createStore(reducer, composeEnhancers(applyMiddleware(...middleware)))
 }
 
-const dispatchToOthers = action => {
-  if (isInAgency('client')) {
-    let dispatchProxy = DispatchProxy[0]
-    dispatchProxy.call(null, action)
-  } else {
-    // so it appears to have come from us
-    delete action.meta.antares.connectionId
-    action.meta.antares.originAgentId = Antares.agentId
-    remoteActions.next(action)
-  }
-}
-
 const getUpdateOp = (before, after) => {
   try {
     return (before && after && mongoDiffer(before.toJS(), after.toJS())) || {}
@@ -119,6 +108,13 @@ const diffMiddleware = ({
   const preState = store.getState().antares
   const preViewState = store.getState().view
 
+  logger.log(
+    `${action.type}(${action.meta.antares.localOnly ? 'localOnly:true' : ''})`,
+    {
+      prefix: `AS1 (${action.meta.antares.actionId})`
+    }
+  )
+
   next(action) // reduce / dispatch it
   const postState = store.getState().antares
 
@@ -130,6 +126,12 @@ const diffMiddleware = ({
   let collection = key && key.length === 2 && key[0]
   let id = key instanceof Array ? key[key.length - 1] : key
   let keyPath = key instanceof Array ? key : [key]
+
+  logger.log(
+    `${action.type}(${action.meta.antares.localOnly ? 'localOnly:true' : ''})`,
+    {
+    prefix: `AS2 (${action.meta.antares.actionId})`
+  })
 
   let _mongoDiff
   if (action.type === 'Antares.store') {
@@ -182,7 +184,7 @@ const diffMiddleware = ({
 
 export const initializeStore = ({
   ReducerForKey,
-  onKeyNotDefined,
+  onCacheMiss,
   Epics,
   agentId,
   notifyParentAgent
@@ -196,11 +198,23 @@ export const initializeStore = ({
   if (userEpics) {
     // To each userEpic we append our own behaviors
     const antaresEnhancedEpics = userEpics
+      .filter(userEpic => !!userEpic)
       .map(userEpic => {
-        return (action$, state) =>
-          userEpic(action$, state).map(action =>
-            enhanceActionMeta(action, null, { agentId })
-          ).do(notifyParentAgent)
+        return (action$, state) => {
+          const agentMatchedAction$ = action$.filter(action => {
+            if (action.meta.antares.epicAgent)
+              return action.meta.antares.epicAgent === agentId
+            else return true
+          })
+          return userEpic(agentMatchedAction$, state)
+            .map(action => enhanceActionMeta(action, null, { agentId }))
+            .do(action =>
+              logger.log(action, {
+                prefix: `AEp (${action.meta.antares.actionId})`
+              })
+            )
+            .do(notifyParentAgent)
+        }
       })
 
     const rootEpic = combineEpics(...antaresEnhancedEpics)
@@ -210,7 +224,7 @@ export const initializeStore = ({
 
   const viewReducer = ViewReducer[0]
   const rootReducer = combineReducers({
-    antares: antaresReducer({ ReducerForKey, onKeyNotDefined }),
+    antares: antaresReducer({ ReducerForKey, onCacheMiss }),
     view: viewReducer
   })
 

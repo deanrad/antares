@@ -1,11 +1,18 @@
+import { inAgencyRun } from './agency'
+
 export const logger = {
   log: (msg, opts = {}) => {
-    const toPrint = opts.xform ? opts.xform(msg) : msg
-    const prefix = (opts.prefix || '') + '> '
-    if (opts.newSection) {
-      console.log('  --------------  ')
-    }
-    console.log(prefix + toPrint)
+    const xmsg = opts.xform ? opts.xform(msg) : msg
+    const toPrint = (typeof xmsg === 'string') ? xmsg : JSON.stringify(xmsg)
+    const inAgency = opts.inAgency ? opts.inAgency : 'any'
+
+    inAgencyRun(inAgency, () => {
+      const prefix = opts.prefix ? (opts.prefix + '> ') : ''
+      if (opts.newSection) {
+        console.log('  --------------  ')
+      }
+      console.log(prefix + toPrint)
+    })
   },
   debug: (...args) => logger.log(...args)
 }

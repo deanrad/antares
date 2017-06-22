@@ -1,4 +1,5 @@
 import './_polyfills'
+import { logger } from './logger'
 import Rx from 'rxjs'
 import Promise from 'bluebird'
 // Promise.config({
@@ -61,7 +62,7 @@ export const AntaresInit = AntaresConfig => {
   }
 
   const ReducerForKey = AntaresConfig.ReducerForKey || (key => noopReducer)
-  const onKeyNotDefined = AntaresConfig.onKeyNotDefined || (() => null)
+  const onCacheMiss = AntaresConfig.onCacheMiss || (() => null)
   const Epics = AntaresConfig.Epics || {}
 
   // Identify this instance of this JS process
@@ -83,7 +84,13 @@ export const AntaresInit = AntaresConfig => {
   }
 
   // Construct the store for this Agent!
-  const store = initializeStore({ ReducerForKey, onKeyNotDefined, Epics, agentId, notifyParentAgent })
+  const store = initializeStore({
+    ReducerForKey,
+    onCacheMiss,
+    Epics,
+    agentId,
+    notifyParentAgent
+  })
 
   // defineDispatchEndpoint
   if (AntaresConfig.defineDispatchEndpoint) {
@@ -95,17 +102,13 @@ export const AntaresInit = AntaresConfig => {
   // defineRemoteActionsProducer
   if (AntaresConfig.defineRemoteActionsProducer) {
     inAgencyRun('server', () => {
-      AntaresConfig.defineRemoteActionsProducer(store, agentId)
+      AntaresConfig.defineRemoteActionsProducer({ store, agentId, onCacheMiss })
     })
   }
 
   // defineRemoteActionsConsumer
   let remoteActionDispatcher = action => {
-    if (
-      !(action.meta && action.meta.antares && action.meta.antares.localOnly)
-    ) {
-      store.dispatch(action)
-    }
+    store.dispatch(action)
   }
 
   if (AntaresConfig.defineRemoteActionsConsumer) {
@@ -131,11 +134,16 @@ export const AntaresInit = AntaresConfig => {
           reject(new ReductionError(ex))
         }
       }
-    }).then(action => {
-      return notifyParentAgent(action).catch(ex => {
-        throw new ParentNotificationError(ex)
-      })
     })
+      .then(action => {
+        return notifyParentAgent(action).catch(ex => {
+          throw new ParentNotificationError(ex)
+        })
+      })
+      .catch(ex => {
+        console.error('Antares Exception: ', ex, ex.stack)
+        throw ex
+      })
   }
 
   // in order subscribed
@@ -244,6 +252,12 @@ export const AntaresInit = AntaresConfig => {
       payloadEnhancer,
       metaEnhancer
     )
+
+    logger.log(`Saw action of type: ${enhancedAction.type}`, {
+      prefix: `AA (${enhancedAction.meta.antares.actionId})`,
+      inAgency: 'server'
+    })
+
     let returnPromise = dispatchAloud(enhancedAction)
 
     return Object.assign(returnPromise, {

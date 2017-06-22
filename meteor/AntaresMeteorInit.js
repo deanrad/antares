@@ -88,16 +88,26 @@ const defineRemoteActionsConsumer = () => {
 }
 
 // The remoteActionsProducer
-const defineRemoteActionsProducer = (store, agentId) => {
+const defineRemoteActionsProducer = ({ store, agentId, onCacheMiss }) => {
   Meteor.publish('Antares.remoteActions', function publisher(pubFilter) {
     // an abstraction of the client
     let client = {
       connectionId: this.connection.id,
       agentId: null,
       sendAction: action => {
+        logger.log(
+          {
+            conn: this.connection.id.substring(0, 6),
+            type: action.type
+          },
+          {
+            prefix: `AP (${action.meta.antares.actionId})`
+          }
+        )
         let sanitizedAction = fromJS(action)
           .deleteIn(['meta', 'antares', 'connectionId'])
           .deleteIn(['meta', 'antares', 'receivedAt'])
+          .setIn(['meta', 'antares', 'originAgentId'], agentId)
           .toJS()
         this._session.sendAdded(
           'Antares.remoteActions',
@@ -111,16 +121,18 @@ const defineRemoteActionsProducer = (store, agentId) => {
     let server = {
       agentId,
       action$: store.diff$.map(({ action }) => action),
-      store
+      onCacheMiss
     }
 
-    let clientAction$ = antaresPublisher({ server, client, pubFilter })
+    let clientAction$ = antaresPublisher({ server, client, pubFilter, store })
     let clientSub = clientAction$.subscribe(action => {
       client.sendAction(action)
     })
 
     this.onStop(() => {
-      logger.log(`AP (${client.connectionId.substring(0,6)})> unsub: ${JSON.stringify(pubFilter)}`)
+      logger.log(
+        `AP (${client.connectionId.substring(0, 6)})> unsub: ${pubFilter}`
+      )
       clientSub.unsubscribe()
     })
 

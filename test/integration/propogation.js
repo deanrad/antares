@@ -7,7 +7,7 @@ import {
 import Promise from 'bluebird'
 import { minimalConfig } from '../helpers/factories'
 
-let failIfResolved = () => expect(true).to.equal(false)
+let failIfResolved = val => expect(JSON.stringify(val)).to.equal(undefined)
 
 describe('Client Server Topology', () => {
   let server, clientSelf, clientOther
@@ -25,6 +25,11 @@ describe('Client Server Topology', () => {
     })
     serverStore = server.store
 
+    server.subscribeRenderer(({ action: { payload } }) => {
+      if (JSON.stringify(payload || {}).includes('server error')) {
+        throw new Error('forced server error')
+      }
+    })
     // the dispatch proxy is what returns a promise for having communicated the action to the parent,
     // in this case calling the servers dispatcher directly
     const notifyParentAgent = action => {
@@ -32,7 +37,8 @@ describe('Client Server Topology', () => {
       return Promise.resolve(action)
     }
 
-    // Skips pubsub. Consumes actions right off the server's action stream, not for this agent
+    // Skips pubsub. Consumes actions right off the server's action stream, not originated by this agent,
+    // or local mode -
     let testActionsConsumer = agentId => antaresDispatcher =>
       server.action$
         .map(({ action }) => action)
@@ -41,6 +47,7 @@ describe('Client Server Topology', () => {
             action.meta.antares.originAgentId !== agentId ||
             action.meta.antares.reflectAction
         )
+        .filter(action => !action.meta.antares.localOnly)
 
     let clientConfig = {
       ...minimalConfig,
@@ -116,6 +123,36 @@ describe('Client Server Topology', () => {
             ).to.have.property('length', 1)
           })
       })
+
+      describe('An Error in a sync renderer on the server', () => {
+        it('Will result in a rejected Promise on the client and not process on server', () => {
+          let testAction = {
+            type: 'Test.action',
+            payload: { message: 'server errors are afoot!' },
+            meta: { antares: { actionId: 'e230' } }
+          }
+
+          // but we will still have the action dispatched in our client store
+          let clientSelfActions = []
+          let clientSelfSub = clientSelf.action$.subscribe(({ action }) => {
+            clientSelfActions.push(action)
+          })
+
+          // Assert that other agents eventually see it
+          let firstServerAction = server.action$
+            .first()
+            .map(({ action }) => action)
+            .toPromise(Promise)
+            .timeout(100, 'Took too long for firstServerAction')
+
+          let announcementPromise = clientSelf.announce(testAction)
+          expect(clientSelfActions[0]).to.containSubset(testAction)
+
+          return expect(announcementPromise).to.be.rejected
+        })
+      })
+
+      it('Will cause the server to not have processed the action')
 
       it('Will come back to the sender if reflectAction:true', () => {
         let testAction = {
