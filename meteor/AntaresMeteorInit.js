@@ -95,13 +95,11 @@ const defineRemoteActionsProducer = ({ store, agentId, onCacheMiss }) => {
       connectionId: this.connection.id,
       agentId: null,
       sendAction: action => {
+        let key = action.meta.antares && action.meta.antares.key
         logger.log(
+          `${action.type} ${key ? `(key:${key})` : ''}`,
           {
-            conn: this.connection.id.substring(0, 6),
-            type: action.type
-          },
-          {
-            prefix: `AP (${action.meta.antares.actionId})`
+            prefix: `AP (${this.connection.id.substring(0, 6)})`
           }
         )
         let sanitizedAction = fromJS(action)
@@ -131,7 +129,7 @@ const defineRemoteActionsProducer = ({ store, agentId, onCacheMiss }) => {
 
     this.onStop(() => {
       logger.log(
-        `AP (${client.connectionId.substring(0, 6)})> unsub: ${pubFilter}`
+        `AP (${client.connectionId.substring(0, 6)})> unsub: key:${pubFilter.key}`
       )
       clientSub.unsubscribe()
     })

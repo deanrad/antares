@@ -1,6 +1,6 @@
 Package.describe({
     name: 'deanius:antares',
-    version: '0.4.10',
+    version: '0.4.12',
     summary: 'Antares defines a protocol and API for distributed awareness among streaming agents.'
 })
 

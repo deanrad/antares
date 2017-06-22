@@ -44,7 +44,7 @@ export const antaresPublisher = ({ server, client, store, pubFilter }) => {
   let { action$, agentId, onCacheMiss } = server
 
   logger.log(
-    `AP (${client.connectionId.substring(0, 6)})> sub:   ${pubFilter}`,
+    `AP (${client.connectionId.substring(0, 6)})> sub:   key:${pubFilter.key}`,
     { newSection: true }
   )
 
@@ -98,13 +98,5 @@ export const antaresPublisher = ({ server, client, store, pubFilter }) => {
       // this is a consequential action marked localOnly
       .filter(action => !action.meta.antares.localOnly)
       .filter(getFilterFor(pubFilter))
-      .do(action =>
-        logger.debug(
-          `Sending ${action.type} to connectionId:${client.connectionId.substring(0, 6)}`,
-          {
-            prefix: `AP (${action.meta.antares.actionId})`
-          }
-        )
-      )
   )
 }

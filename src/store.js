@@ -109,9 +109,9 @@ const diffMiddleware = ({
   const preViewState = store.getState().view
 
   logger.log(
-    `${action.type}(${action.meta.antares.localOnly ? 'localOnly:true' : ''})`,
+    `${action.type}${action.meta.antares.localOnly ? '(localOnly:true)' : ''}`,
     {
-      prefix: `AS1 (${action.meta.antares.actionId})`
+      prefix: `AS (${action.meta.antares.actionId})`
     }
   )
 
@@ -126,12 +126,6 @@ const diffMiddleware = ({
   let collection = key && key.length === 2 && key[0]
   let id = key instanceof Array ? key[key.length - 1] : key
   let keyPath = key instanceof Array ? key : [key]
-
-  logger.log(
-    `${action.type}(${action.meta.antares.localOnly ? 'localOnly:true' : ''})`,
-    {
-    prefix: `AS2 (${action.meta.antares.actionId})`
-  })
 
   let _mongoDiff
   if (action.type === 'Antares.store') {

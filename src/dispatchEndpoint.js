@@ -10,7 +10,7 @@ import { ReductionError } from './errors'
 export const dispatchEndpoint = store => action => {
   logger.log(
     { type: action.type, local: action.meta.antares.localOnly },
-    { prefix: `AE (${action.meta.antares.actionId})` }
+    { prefix: `AE (${action.meta.antares.actionId})`, newSection: true }
   )
 
   // Now attempt to dispatch the action to the local store.
