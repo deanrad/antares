@@ -74,8 +74,14 @@ export const antaresReducer = ({ ReducerForKey, onCacheMiss }) => (
   return state
 }
 
+// Must align with the combineReducers keys
+const defaultInitial = {
+  antares: new iMap,
+  view: {}
+}
+
 // A utility function which incorporates Redux DevTools and optional middleware
-const makeStoreFromReducer = (reducer, middleware) => {
+const makeStoreFromReducer = (reducer, initialState, middleware) => {
   let composeEnhancers = compose
 
   // in browsers override compose to hook in DevTools
@@ -87,7 +93,7 @@ const makeStoreFromReducer = (reducer, middleware) => {
       composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
   })
 
-  return createStore(reducer, composeEnhancers(applyMiddleware(...middleware)))
+  return createStore(reducer, initialState, composeEnhancers(applyMiddleware(...middleware)))
 }
 
 const getUpdateOp = (before, after) => {
@@ -181,7 +187,8 @@ export const initializeStore = ({
   onCacheMiss,
   Epics,
   agentId,
-  notifyParentAgent
+  notifyParentAgent,
+  initialState
 }) => {
   // the keys of Epics are only for documentation purposes now
   const userEpics = Object.values(Epics)
@@ -218,12 +225,13 @@ export const initializeStore = ({
 
   const viewReducer = ViewReducer[0]
   const rootReducer = combineReducers({
+    ...initialState,
     antares: antaresReducer({ ReducerForKey, onCacheMiss }),
     view: viewReducer
   })
 
   // Each middleware recieves actions produced by the previous
-  const store = makeStoreFromReducer(rootReducer, middlewares)
+  const store = makeStoreFromReducer(rootReducer, initialState, middlewares)
 
   // Give the store magical observable properties
   return Object.assign(store, {

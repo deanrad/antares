@@ -67,12 +67,13 @@ export const AntaresInit = AntaresConfig => {
 
   // Identify this instance of this JS process
   const agentId = AntaresConfig.agentId || NewId[0]()
+  const initialState = AntaresConfig.initialState
 
   // notifyParentAgent
   let notifier =
     AntaresConfig.notifyParentAgent ||
     (action => {
-      console.warn('No way to notify parent of action: ', action.type, agentId)
+      logger.warn('No way to notify parent of action: ', action.type, agentId)
       return Promise.resolve(action)
     })
 
@@ -89,7 +90,8 @@ export const AntaresInit = AntaresConfig => {
     onCacheMiss,
     Epics,
     agentId,
-    notifyParentAgent
+    notifyParentAgent,
+    initialState
   })
 
   // defineDispatchEndpoint
@@ -141,7 +143,7 @@ export const AntaresInit = AntaresConfig => {
         })
       })
       .catch(ex => {
-        console.error('Antares Exception: ', ex, ex.stack)
+        logger.error('Antares Exception: ', ex, ex.stack)
         throw ex
       })
   }
@@ -191,8 +193,8 @@ export const AntaresInit = AntaresConfig => {
           throw new RenderError(ex)
         }
       },
-      error: e => console.warn('SR> saw error', e),
-      complete: e => console.warn('SR> done')
+      error: e => logger.warn('SR> saw error', e),
+      complete: e => logger.warn('SR> done')
     }
     return scheduledStream.subscribe(observer)
   }

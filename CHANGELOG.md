@@ -7,3 +7,9 @@
 * tidied up loggign everywhere
 * remoteActionsConsumer stamps parentAgentId in originAgentId field
 * As an agent publishes remoteActions, they set their agentId in `originAgentId`
+
+### [0.4.13]
+* Env var ANTARES_LOG_LEVEL=0|1|2|3 controls logging
+* Can AntaresInit with initialState
+
+

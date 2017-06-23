@@ -10,4 +10,5 @@ chai.use(chaiAsPromised)
 export const minimalConfig = {
     // silences the message 'No way to notify parent of action'
     notifyParentAgent: action => Promise.resolve(action)
+    // initialState can initialize { antares, view }
 }

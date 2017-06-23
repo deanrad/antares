@@ -68,7 +68,6 @@ describe('Antares Instance', () => {
     let reducers = {
       '404': state => state,
       '501': () => {
-        console.log('heeeeeere')
         throw new Error('501')
       },
       iListPush: (state = new iList(), payload) => {

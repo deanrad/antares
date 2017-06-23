@@ -4,6 +4,7 @@ import {
   getUserConfig,
   Observable
 } from '../../src/antares'
+import { Map as iMap } from 'immutable'
 import { minimalConfig } from '../helpers/factories'
 
 describe('AntaresInit', () => {
@@ -15,9 +16,13 @@ describe('AntaresInit', () => {
     let Antares
     let config
     const clientOneId = 'Client 1'
+    const initialViewState = { foo: 'bar' }
 
     before(() => {
-      config = minimalConfig
+      config = {
+        ...minimalConfig,
+        initialState: {antares: new iMap, view: initialViewState}
+      }
       Antares = AntaresInit(config)
     })
 
@@ -40,6 +45,13 @@ describe('AntaresInit', () => {
       it('#store', () => {
         expect(Antares).to.have.property('store')
         expect(Antares.store).to.be.instanceOf(Object)
+        let initialState = Antares.store.getState()
+
+        expect(initialState).to.have.property('antares')
+        expect(initialState).to.have.property('view')
+        // only these keys are allowed in initialState
+        expect(Object.keys(initialState)).to.deep.eql(['antares', 'view'])
+        expect(initialState.view).to.eql(initialViewState)
       })
 
       // Meteor properties that should be in any instance
