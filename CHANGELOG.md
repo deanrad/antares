@@ -12,4 +12,6 @@
 * Env var ANTARES_LOG_LEVEL=0|1|2|3 controls logging
 * Can AntaresInit with initialState
 
+### [0.4.14]
+* Export Blueird as Promise
 

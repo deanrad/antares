@@ -9,6 +9,7 @@ import Promise from 'bluebird'
 // })
 
 export { default as Rx } from 'rxjs'
+export { default as Promise } from 'bluebird'
 export const { Observable } = Rx
 export {
   default as Immutable,

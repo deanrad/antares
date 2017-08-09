@@ -1,6 +1,6 @@
 {
   "name": "antares-protocol",
-  "version": "0.4.13",
+  "version": "0.4.14",
   "description": "Antares defines a protocol and API for distributed awareness among streaming agents.",
   "main": "dist/antares.js",
   "scripts": {
@@ -28,6 +28,7 @@
     "babel-core": "^6.23.0",
     "babel-loader": "^6.2.10",
     "babel-runtime": "^6.23.0",
+    "bluebird": "^3.5.0",
     "immutable": "^3.8.1",
     "immutablediff": "^0.4.4",
     "mongodb-diff": "^0.4.3",
@@ -44,7 +45,6 @@
     "babel-polyfill": "6.x",
     "babel-preset-latest": "6.x",
     "babel-register": "6.x",
-    "bluebird": "^3.5.0",
     "chai": "3.5.0",
     "chai-as-promised": "^6.0.0",
     "chai-subset": "^1.5.0",

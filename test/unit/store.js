@@ -38,12 +38,10 @@ describe('Antares Store', () => {
     callCount = 0
   })
 
-  it('gets its initialState by invoking the fn returned by ReducerForKey with no args', () => {
+  it('is initialized to an empty immutable map', () => {
     let Antares = AntaresInit({ ReducerForKey, initialState })
-    expect(isImmutable(Antares.getState())).to.be.ok
-
-    //expect(antaresState.toJS()).to.eql(initialState)
-    Antares.process({ type: 'Antares.init', payload: initialState })
-    expect(Antares.getState().toJS()).to.eql(initialState)
-  });
-});
+    let antaresState = Antares.getState()
+    expect(isImmutable(antaresState)).to.be.ok
+    expect(antaresState.toJS()).to.eql({})
+  })
+})
