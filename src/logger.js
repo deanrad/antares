@@ -1,8 +1,9 @@
 import { isInAgency } from './agency'
 
-const curLevel = typeof process.env.ANTARES_LOG_LEVEL === 'undefined'
-  ? 2
-  : Number(process.env.ANTARES_LOG_LEVEL)
+const curLevel =
+  typeof process.env.ANTARES_LOG_LEVEL === 'undefined'
+    ? 2
+    : Number(process.env.ANTARES_LOG_LEVEL)
 
 export const logger = {
   log: (
@@ -17,7 +18,7 @@ export const logger = {
 
     const prefixText = prefix ? prefix + '> ' : ''
     if (newSection) {
-      console.log('  --------------  ')
+      console.log('----------------  ')
     }
     console.log(prefixText + toPrint)
   },

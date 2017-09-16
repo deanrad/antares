@@ -44,8 +44,14 @@ export const antaresPublisher = ({ server, client, store, pubFilter }) => {
   let { action$, agentId, onCacheMiss } = server
 
   logger.log(
-    `AP (${client.connectionId.substring(0, 6)})> sub:   key:${pubFilter.key}`,
-    { newSection: true }
+    `New subscriber: ${client.connectionId.substring(
+      0,
+      6
+    )} (key:${pubFilter.key})`,
+    {
+      prefix: 'AP',
+      newSection: true
+    }
   )
 
   const initAction = {

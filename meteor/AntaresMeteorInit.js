@@ -41,10 +41,8 @@ export const defineDispatchEndpoint = antaresDispatcher => {
       if (!action.meta) action.meta = { antares: {} }
       if (!action.meta.antares) action.meta.antares = {}
       ;(action.meta.antares.connectionId =
-        client &&
-        client.connection &&
-        client.connection
-          .id), (action.meta.antares.receivedAt = new Date().getTime())
+        client && client.connection && client.connection.id),
+        (action.meta.antares.receivedAt = new Date().getTime())
 
       return antaresDispatcher(action)
     }
@@ -96,12 +94,14 @@ const defineRemoteActionsProducer = ({ store, agentId, onCacheMiss }) => {
       agentId: null,
       sendAction: action => {
         let key = action.meta.antares && action.meta.antares.key
-        logger.log(
-          `${action.type} ${key ? `(key:${key})` : ''}`,
-          {
-            prefix: `AP (${this.connection.id.substring(0, 6)})`
-          }
-        )
+        let actionId = action.meta.antares && action.meta.antares.actionId
+        let localOnly = action.meta.antares && action.meta.antares.localOnly
+
+        if (localOnly) return
+
+        logger.log(`${action.type} ${key ? `(key:${key})` : ''}`, {
+          prefix: `AP (${actionId})`
+        })
         let sanitizedAction = fromJS(action)
           .deleteIn(['meta', 'antares', 'connectionId'])
           .deleteIn(['meta', 'antares', 'receivedAt'])
@@ -129,7 +129,13 @@ const defineRemoteActionsProducer = ({ store, agentId, onCacheMiss }) => {
 
     this.onStop(() => {
       logger.log(
-        `AP (${client.connectionId.substring(0, 6)})> unsub: key:${pubFilter.key}`
+        `Bye subscriber: ${client.connectionId.substring(
+          0,
+          6
+        )} (key:${pubFilter.key})`,
+        {
+          prefix: `AP`
+        }
       )
       clientSub.unsubscribe()
     })
@@ -157,7 +163,7 @@ const remembererFor = store => cursor => {
       let iState = store.getState().antares
       let keyPath = [collName, id]
       if (!iState.hasIn(keyPath)) {
-        logger.log('AM> Remembering ', collName, id)
+        logger.log('AM> Remembering ', { key: keyPath })
         store.dispatch({
           type: 'Antares.store',
           payload: fields,

@@ -8,10 +8,10 @@ import { ReductionError } from './errors'
 // The publication of the dispatched, and consequent actions is done by a final middleware
 // that runs after the epic middleware to ensure that every listener potentially can hear
 export const dispatchEndpoint = store => action => {
-  logger.log(
-    { type: action.type, local: action.meta.antares.localOnly },
-    { prefix: `AE (${action.meta.antares.actionId})`, newSection: true }
-  )
+  logger.log(`New action ${action.type}`, {
+    prefix: `AE (${action.meta.antares.actionId})`,
+    newSection: true
+  })
 
   // Now attempt to dispatch the action to the local store.
   // Any renderers that have been attached synchronously will run in the order subscribed.

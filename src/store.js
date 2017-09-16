@@ -76,7 +76,7 @@ export const antaresReducer = ({ ReducerForKey, onCacheMiss }) => (
 
 // Must align with the combineReducers keys
 const defaultInitial = {
-  antares: new iMap,
+  antares: new iMap(),
   view: {}
 }
 
@@ -93,7 +93,11 @@ const makeStoreFromReducer = (reducer, initialState, middleware) => {
       composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
   })
 
-  return createStore(reducer, initialState, composeEnhancers(applyMiddleware(...middleware)))
+  return createStore(
+    reducer,
+    initialState,
+    composeEnhancers(applyMiddleware(...middleware))
+  )
 }
 
 const getUpdateOp = (before, after) => {
@@ -115,7 +119,9 @@ const diffMiddleware = ({
   const preViewState = store.getState().view
 
   logger.log(
-    `${action.type}${action.meta.antares.localOnly ? '(localOnly:true)' : ''}`,
+    `Reducing ${action.type}${action.meta.antares.localOnly
+      ? ' (localOnly:true)'
+      : ''}`,
     {
       prefix: `AS (${action.meta.antares.actionId})`
     }
@@ -169,10 +175,11 @@ const diffMiddleware = ({
     }
   }
 
-  const mongoDiff = _mongoDiff &&
+  const mongoDiff =
+    _mongoDiff &&
     (_mongoDiff.remove || Object.keys(_mongoDiff.updateOp).length > 0)
-    ? _mongoDiff
-    : null
+      ? _mongoDiff
+      : null
 
   // Reasons this line can fail:
   // - Reducer throws an error

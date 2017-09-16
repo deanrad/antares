@@ -1,7 +1,8 @@
 {
   "name": "antares-protocol",
-  "version": "0.4.14",
-  "description": "Antares defines a protocol and API for distributed awareness among streaming agents.",
+  "version": "0.4.15",
+  "description":
+    "Antares defines a protocol and API for distributed awareness among streaming agents.",
   "main": "dist/antares.js",
   "scripts": {
     "test": "gulp",
