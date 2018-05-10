@@ -1,8 +1,7 @@
 {
   "name": "antares-protocol",
   "version": "0.4.15",
-  "description":
-    "Antares defines a protocol and API for distributed awareness among streaming agents.",
+  "description": "Antares defines a protocol and API for distributed awareness among streaming agents.",
   "main": "dist/antares.js",
   "scripts": {
     "test": "gulp",
@@ -44,13 +43,12 @@
     "babel-loader": "6.x",
     "babel-plugin-transform-object-rest-spread": "6.x",
     "babel-polyfill": "6.x",
-    "babel-preset-latest": "6.x",
+    "babel-preset-env": "^1.7.0",
     "babel-register": "6.x",
     "chai": "3.5.0",
     "chai-as-promised": "^6.0.0",
     "chai-subset": "^1.5.0",
     "del": "2.2.2",
-    "git-hooks": "^1.1.8",
     "glob": "7.0.6",
     "gulp": "3.9.1",
     "gulp-eslint": "3.0.1",

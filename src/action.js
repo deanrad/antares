@@ -1,16 +1,17 @@
-import { fromJS, Map as iMap } from 'immutable'
-import { MetaEnhancers } from './config'
-import Rx from 'rxjs'
+import { fromJS, Map as iMap } from "immutable"
+import Rx from "rxjs"
+
+import { MetaEnhancers } from "./config"
 
 let { Observable } = Rx
 
 export const enhanceActionMeta = (action, oneTimeMetaEnhancer, Antares) => {
-  let iAction = fromJS(action || {}).updateIn(['meta', 'antares'], p => {
+  let iAction = fromJS(action || {}).updateIn(["meta", "antares"], p => {
     return p || new iMap()
   })
 
   let enhancers
-  if (typeof oneTimeMetaEnhancer === 'function') {
+  if (typeof oneTimeMetaEnhancer === "function") {
     enhancers = MetaEnhancers.concat(oneTimeMetaEnhancer)
   } else {
     enhancers = MetaEnhancers
@@ -18,11 +19,11 @@ export const enhanceActionMeta = (action, oneTimeMetaEnhancer, Antares) => {
 
   // apply meta enhancers, making sure they dont mess with anything
   let enhancedIAction = enhancers.reduce((iAction, enhancer) => {
-    if (typeof enhancer !== 'function') {
+    if (typeof enhancer !== "function") {
       debugger
     }
     let newMeta = enhancer(iAction, Antares)
-    return iAction.mergeIn(['meta', 'antares'], newMeta)
+    return iAction.mergeIn(["meta", "antares"], newMeta)
   }, iAction)
 
   return enhancedIAction.toJS()
@@ -37,11 +38,11 @@ export const createConsequence = (parent, consequence) => {
     type,
     payload,
     meta: {
-        ...meta,
+      ...meta,
       antares: {
         ...parentMeta,
         ...antaresMeta,
-        actionId: Math.floor((Math.random() * 1000000)).toString(12),
+        actionId: Math.floor(Math.random() * 1000000).toString(12),
         parentActionId: parent.meta.antares.actionId
       }
     }

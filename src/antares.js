@@ -1,47 +1,37 @@
-import './_polyfills'
-import { logger } from './logger'
-import Rx from 'rxjs'
-import Promise from 'bluebird'
+import "./_polyfills"
+
+import { createClass as createAsteroid } from "asteroid"
+import Promise from "bluebird"
+import Rx from "rxjs"
+
+import { enhanceActionMeta } from "./action"
+import { inAgencyRun } from "./agency"
+import { Agents, MetaEnhancers, NewId, Types, ViewReducer } from "./config"
+import { dispatchEndpoint as defaultDispatchEndpoint } from "./dispatchEndpoint"
+import { ParentNotificationError, ReductionError, RenderError } from "./errors"
+import { logger } from "./logger"
+import { initializeStore } from "./store"
+
 // Promise.config({
 //     warnings: true,
 //     longStackTraces: true,
 //     cancellation: true
 // })
 
-export { default as Rx } from 'rxjs'
-export { default as Promise } from 'bluebird'
+export { default as Rx } from "rxjs"
+export { default as Promise } from "bluebird"
 export const { Observable } = Rx
 export {
   default as Immutable,
   fromJS,
   Map as iMap,
   List as iList
-} from 'immutable'
-export { createReducer } from 'redux-act'
-export { combineReducers } from 'redux-immutable'
-import {
-  Agents,
-  ViewReducer,
-  MetaEnhancers,
-  DispatchProxy,
-  NewId,
-  Types
-} from './config'
-import { enhanceActionMeta } from './action'
-import { initializeStore } from './store'
-import { inAgencyRun, isInAgency } from './agency'
-import { createClass as createAsteroid } from 'asteroid'
-import { dispatchEndpoint as defaultDispatchEndpoint } from './dispatchEndpoint'
-export * from './agency'
-export * from './action'
-export * from './errors'
-import {
-  ReductionError,
-  TypeValidationError,
-  ParentNotificationError,
-  RenderError
-} from './errors'
-
+} from "immutable"
+export { createReducer } from "redux-act"
+export { combineReducers } from "redux-immutable"
+export * from "./agency"
+export * from "./action"
+export * from "./errors"
 // Allow the caller to initialize us, extending their config onto ours
 export const AntaresInit = AntaresConfig => {
   let Antares = {}
@@ -74,7 +64,7 @@ export const AntaresInit = AntaresConfig => {
   let notifier =
     AntaresConfig.notifyParentAgent ||
     (action => {
-      logger.warn('No way to notify parent of action: ', action.type, agentId)
+      logger.warn("No way to notify parent of action: ", action.type, agentId)
       return Promise.resolve(action)
     })
 
@@ -97,14 +87,14 @@ export const AntaresInit = AntaresConfig => {
 
   // defineDispatchEndpoint
   if (AntaresConfig.defineDispatchEndpoint) {
-    inAgencyRun('server', () => {
+    inAgencyRun("server", () => {
       AntaresConfig.defineDispatchEndpoint(defaultDispatchEndpoint(store))
     })
   }
 
   // defineRemoteActionsProducer
   if (AntaresConfig.defineRemoteActionsProducer) {
-    inAgencyRun('server', () => {
+    inAgencyRun("server", () => {
       AntaresConfig.defineRemoteActionsProducer({ store, agentId, onCacheMiss })
     })
   }
@@ -115,7 +105,7 @@ export const AntaresInit = AntaresConfig => {
   }
 
   if (AntaresConfig.defineRemoteActionsConsumer) {
-    inAgencyRun('client', () => {
+    inAgencyRun("client", () => {
       // TODO subscribe and handle resubscribing if exception occurs
       let remoteAction$ = AntaresConfig.defineRemoteActionsConsumer()
       let remoteActionsSub = remoteAction$
@@ -144,7 +134,7 @@ export const AntaresInit = AntaresConfig => {
         })
       })
       .catch(ex => {
-        logger.error('Antares Exception: ', ex, ex.stack)
+        logger.error("Antares Exception: ", ex, ex.stack)
         throw ex
       })
   }
@@ -158,7 +148,7 @@ export const AntaresInit = AntaresConfig => {
     alternateStream
   ) => {
     const {
-      mode = 'sync',
+      mode = "sync",
       xform = same => same,
       filter = () => true,
       actionStreamKey = `renderer[${allRenderersCount}]`
@@ -173,9 +163,10 @@ export const AntaresInit = AntaresConfig => {
 
     // The final stream we subscribe to with scheduling
     // About RXJS5 schedulers: https://github.com/ReactiveX/rxjs/blob/master/doc/scheduler.md
-    const scheduledStream = mode === 'async'
-      ? actionStream.observeOn(Rx.Scheduler.asap)
-      : actionStream
+    const scheduledStream =
+      mode === "async"
+        ? actionStream.observeOn(Rx.Scheduler.asap)
+        : actionStream
 
     // This turns out to a great way to defer - it puts an item on
     // the microtask queue, executing ASAP in most cases
@@ -194,15 +185,15 @@ export const AntaresInit = AntaresConfig => {
           throw new RenderError(ex)
         }
       },
-      error: e => logger.warn('SR> saw error', e),
-      complete: e => logger.warn('SR> done')
+      error: e => logger.warn("SR> saw error", e),
+      complete: e => logger.warn("SR> done")
     }
     return scheduledStream.subscribe(observer)
   }
 
   const saveParentAgentId = store.diff$
     .map(({ action }) => action)
-    .filter(({ type }) => type === 'Antares.init')
+    .filter(({ type }) => type === "Antares.init")
     .map(action => action.meta.antares.parentAgentId)
     .do(parentAgentId => {
       Object.assign(Antares, { parentAgentId })
@@ -220,9 +211,8 @@ export const AntaresInit = AntaresConfig => {
     let stowaway = payloadEnhancer()
 
     // Can't enhance non-Object payload like Numbers
-    let enhancedPayload = payload instanceof Object
-      ? { ...stowaway, ...payload }
-      : payload
+    let enhancedPayload =
+      payload instanceof Object ? { ...stowaway, ...payload } : payload
 
     // Use either of our syntaxes: ActionCreator, string, or action
     if (actionCreatorOrType.call) {
@@ -258,7 +248,7 @@ export const AntaresInit = AntaresConfig => {
 
     logger.log(`Saw action of type: ${enhancedAction.type}`, {
       prefix: `AA (${enhancedAction.meta.antares.actionId})`,
-      inAgency: 'server'
+      inAgency: "server"
     })
 
     let returnPromise = dispatchAloud(enhancedAction)
@@ -280,7 +270,7 @@ export const AntaresInit = AntaresConfig => {
             // TODO 1195:  action.meta.antares.concludesEpic === enhancedAction.meta.antares.actionId
           )
           .map(({ action }) => {
-            if (action.type.endsWith('.error')) {
+            if (action.type.endsWith(".error")) {
               throw action
             }
             return action
@@ -306,7 +296,7 @@ export const AntaresInit = AntaresConfig => {
     agentId,
     subscribe: filter => {
       // TODO provide subscription tracking functions
-      asteroid.subscribe('Antares.remoteActions', filter)
+      asteroid.subscribe("Antares.remoteActions", filter)
     },
     subscribeRenderer,
     store,

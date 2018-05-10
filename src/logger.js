@@ -1,24 +1,24 @@
-import { isInAgency } from './agency'
+import { isInAgency } from "./agency"
 
 const curLevel =
-  typeof process.env.ANTARES_LOG_LEVEL === 'undefined'
+  typeof process.env.ANTARES_LOG_LEVEL === "undefined"
     ? 2
     : Number(process.env.ANTARES_LOG_LEVEL)
 
 export const logger = {
   log: (
     msg,
-    { xform = x => x, inAgency = 'any', level = 2, newSection, prefix }
+    { xform = x => x, inAgency = "any", level = 2, newSection, prefix }
   ) => {
     const xmsg = xform(msg)
-    const toPrint = typeof xmsg === 'string' ? xmsg : JSON.stringify(xmsg)
+    const toPrint = typeof xmsg === "string" ? xmsg : JSON.stringify(xmsg)
 
     if (!isInAgency(inAgency)) return
     if (level > curLevel) return
 
-    const prefixText = prefix ? prefix + '> ' : ''
+    const prefixText = prefix ? prefix + "> " : ""
     if (newSection) {
-      console.log('----------------  ')
+      console.log("----------------  ")
     }
     console.log(prefixText + toPrint)
   },
@@ -33,7 +33,7 @@ export const ppAction = action => {
     ...action.meta,
     antares: {
       ...action.meta.antares,
-      key: key && (key.join ? '[' + key.join(', ') + ']' : key)
+      key: key && (key.join ? "[" + key.join(", ") + "]" : key)
     }
   }
 

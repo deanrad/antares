@@ -1,22 +1,11 @@
-import {
-  AntaresInit,
-  getConfig,
-  getUserConfig,
-  Observable,
-  fromJS,
-  iList,
-  iMap,
-  ReductionError,
-  TypeValidationError,
-  ParentNotificationError
-} from '../../src/antares'
+import { expect } from "chai"
 
-import { minimalConfig } from '../helpers/factories'
+import { AntaresInit, iMap } from "../../src/antares"
 
 // theres a newer better API for this if we update immutable
 const isImmutable = iMap.isMap
 
-describe('Antares Store', () => {
+describe("Antares Store", () => {
   let callCount = 0
 
   // the antares part of the store expects to have 1 or more objects stored under an objectkey
@@ -38,7 +27,7 @@ describe('Antares Store', () => {
     callCount = 0
   })
 
-  it('is initialized to an empty immutable map', () => {
+  it("is initialized to an empty immutable map", () => {
     let Antares = AntaresInit({ ReducerForKey, initialState })
     let antaresState = Antares.getState()
     expect(isImmutable(antaresState)).to.be.ok

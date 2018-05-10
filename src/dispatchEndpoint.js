@@ -1,5 +1,5 @@
-import { logger, ppAction } from './logger'
-import { ReductionError } from './errors'
+import { ReductionError } from "./errors"
+import { logger } from "./logger"
 
 // Defines the upstream (aka server) implementation of dispatch which:
 //   dispatches to local store

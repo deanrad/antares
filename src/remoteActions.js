@@ -1,6 +1,6 @@
-import Rx from 'rxjs'
-import { fromJS } from 'immutable'
-import { logger } from './logger'
+import { fromJS } from "immutable"
+
+import { logger } from "./logger"
 
 // Returns a function implementing our remoteActions filter rules:
 // Subscription styles:
@@ -12,7 +12,7 @@ import { logger } from './logger'
 //
 export const getFilterFor = pubFilter => action => {
   // must explicitly pass the wildcard to be unlimited
-  if (pubFilter === '*') return true
+  if (pubFilter === "*") return true
 
   // actions without antares meta at all do not pass
   let actionMeta = action.meta && action.meta.antares
@@ -44,18 +44,17 @@ export const antaresPublisher = ({ server, client, store, pubFilter }) => {
   let { action$, agentId, onCacheMiss } = server
 
   logger.log(
-    `New subscriber: ${client.connectionId.substring(
-      0,
-      6
-    )} (key:${pubFilter.key})`,
+    `New subscriber: ${client.connectionId.substring(0, 6)} (key:${
+      pubFilter.key
+    })`,
     {
-      prefix: 'AP',
+      prefix: "AP",
       newSection: true
     }
   )
 
   const initAction = {
-    type: 'Antares.init',
+    type: "Antares.init",
     payload: {}, // sets, but will not overwrite, the contents of store.antares
     meta: {
       antares: {
@@ -71,7 +70,7 @@ export const antaresPublisher = ({ server, client, store, pubFilter }) => {
   let rawObject
 
   let populationAction = {
-    type: 'Antares.store',
+    type: "Antares.store",
     payload: null,
     meta: {
       antares: {

@@ -1,17 +1,18 @@
-import { applyMiddleware, compose, createStore, combineReducers } from 'redux'
-import { createEpicMiddleware, combineEpics } from 'redux-observable'
-import { fromJS, Map as iMap } from 'immutable'
+import { fromJS, Map as iMap } from "immutable"
+import iDiffer from "immutablediff"
+import { diff as mongoDiffer } from "mongodb-diff"
+import { applyMiddleware, combineReducers, compose, createStore } from "redux"
+import { combineEpics, createEpicMiddleware } from "redux-observable"
+import Rx from "rxjs/Rx"
+
+import { enhanceActionMeta } from "./action"
+import { inAgencyRun } from "./agency"
+import { NewId, ViewReducer } from "./config"
+import { KeyLookupFailed } from "./errors"
+import { logger } from "./logger"
+
 // immutablediff -  RFC 6902 diff as immutable List
 // mongodb-diff - mongo operator
-import iDiffer from 'immutablediff'
-import { diff as mongoDiffer } from 'mongodb-diff'
-import Rx from 'rxjs/Rx'
-import { ViewReducer, DispatchProxy, NewId } from './config'
-import { inAgencyRun, isInAgency } from './agency'
-import { KeyLookupFailed } from './errors'
-import { enhanceActionMeta } from './action'
-import { logger, ppAction } from './logger'
-
 // handles storing, updating, and removing
 export const antaresReducer = ({ ReducerForKey, onCacheMiss }) => (
   state,
@@ -20,7 +21,7 @@ export const antaresReducer = ({ ReducerForKey, onCacheMiss }) => (
   if (!state) return new iMap()
 
   // these are up to the client to manage - we perform no change
-  if (action.type.startsWith('View.')) return state
+  if (action.type.startsWith("View.")) return state
 
   let { type, payload, meta } = action
 
@@ -29,7 +30,7 @@ export const antaresReducer = ({ ReducerForKey, onCacheMiss }) => (
   let providedKeyPath = [].concat(providedKey)
 
   // Fail if record cant be stored at this key
-  if (type === 'Antares.store') {
+  if (type === "Antares.store") {
     // provide an ID if they haven't
     let keyPath = providedKey ? providedKeyPath : [NewId[0]()]
 
@@ -39,7 +40,7 @@ export const antaresReducer = ({ ReducerForKey, onCacheMiss }) => (
   }
 
   // used for cache pre-warming. Throws KeyLookupFailed if the onCacheMiss function fails
-  if (type === 'Antares.fetch') {
+  if (type === "Antares.fetch") {
     if (state.getIn(providedKeyPath) !== undefined) {
       return state
     }
@@ -51,12 +52,12 @@ export const antaresReducer = ({ ReducerForKey, onCacheMiss }) => (
     }
   }
 
-  if (type === 'Antares.forget') {
+  if (type === "Antares.forget") {
     return state.deleteIn(providedKeyPath)
   }
 
   // An antares or other update which should target a specific key
-  if (type === 'Antares.update' || providedKey) {
+  if (type === "Antares.update" || providedKey) {
     // Try to populate it
     if (!state.hasIn(providedKeyPath)) {
       state.setIn(providedKeyPath, fromJS(onCacheMiss(providedKeyPath)))
@@ -66,7 +67,7 @@ export const antaresReducer = ({ ReducerForKey, onCacheMiss }) => (
     return state.updateIn(providedKeyPath, state => reducer(state, action))
   }
 
-  if (type === 'Antares.init') {
+  if (type === "Antares.init") {
     // clean-slate the entire store
     return fromJS(action.payload || {})
   }
@@ -85,10 +86,10 @@ const makeStoreFromReducer = (reducer, initialState, middleware) => {
   let composeEnhancers = compose
 
   // in browsers override compose to hook in DevTools
-  inAgencyRun('client', function() {
+  inAgencyRun("client", function() {
     if (
-      typeof window !== 'undefined' &&
-      typeof window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ === 'function'
+      typeof window !== "undefined" &&
+      typeof window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ === "function"
     )
       composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
   })
@@ -119,9 +120,9 @@ const diffMiddleware = ({
   const preViewState = store.getState().view
 
   logger.log(
-    `Reducing ${action.type}${action.meta.antares.localOnly
-      ? ' (localOnly:true)'
-      : ''}`,
+    `Reducing ${action.type}${
+      action.meta.antares.localOnly ? " (localOnly:true)" : ""
+    }`,
     {
       prefix: `AS (${action.meta.antares.actionId})`
     }
@@ -140,7 +141,7 @@ const diffMiddleware = ({
   let keyPath = key instanceof Array ? key : [key]
 
   let _mongoDiff
-  if (action.type === 'Antares.store') {
+  if (action.type === "Antares.store") {
     _mongoDiff = {
       collection,
       id,
@@ -148,13 +149,13 @@ const diffMiddleware = ({
       upsert: true,
       updateOp: mongoDiffer({}, action.payload || {})
     }
-  } else if (action.type === 'Antares.forget') {
+  } else if (action.type === "Antares.forget") {
     _mongoDiff = {
       collection,
       id,
       remove: true
     }
-  } else if (action.type.startsWith('View.')) {
+  } else if (action.type.startsWith("View.")) {
     let postViewState = store.getState().view
     let viewIDiff = iDiffer(preViewState, postViewState)
     const viewDiff = viewIDiff.size > 0 ? viewIDiff.toJS() : null
