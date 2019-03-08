@@ -38,7 +38,6 @@ module.exports = async ({ Agent, config = {}, log, append, interactive = false }
     // computation with the specified timing. Example:
     // > ⑤ 5 5 5 5 5 ✅ (over ~1000 msec)
     //
-    // prettier-ignore
 
     // LEFTOFF we get a message that we called unsubscribe(), but is someone else subscribed; it doesn't truly cancel
     agent.on("digit", ({ action }) => {
@@ -48,9 +47,7 @@ module.exports = async ({ Agent, config = {}, log, append, interactive = false }
 
       // Return the (cancelable) Observable
       return repeatTheNumber(digit)
-    },
-    { name: "repeater", concurrency }
-  )
+    }, { name: "repeater", concurrency })
 
     const inputStream = interactive ? getUserInputFromStdin() : simulatedUserInput(numArray)
     // wait till our subscription has ended (and its last renderer)

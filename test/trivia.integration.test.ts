@@ -16,12 +16,12 @@ describe("Multi-agent Trivia Game", () => {
 
     // The topology defines who sends actions to whom
     const topology = {
-      player1: [moderator],
-      emcee: [moderator],
-      moderator: [player1, emcee]
-    }
+        player1: [moderator],
+        emcee: [moderator],
+        moderator: [player1, emcee]
+      }
 
-    // Set up agents' properties and relationships to each other
+      // Set up agents' properties and relationships to each other
     ;[moderator, player1, emcee].forEach(agent => {
       // All agents have a store
       const store = init(triviaStoreConfig)

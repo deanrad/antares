@@ -32,19 +32,15 @@ module.exports = ({ agent, after, config = {}, log }) => {
   //                 warn     logout
   // |---------------|--------|----->|
   //    inactivity     warning
-  agent.on(
-    "keyPress",
-    () => {
-      return concat(
-        after(inactivityInterval, { type: "Timeout.warn" }),
-        after(warningInterval, { type: "Timeout.logout" })
-      )
-    },
-    {
-      concurrency: "cutoff", // If a timeout exists when we're triggered, replace it with this new one
-      processResults: true // Obviates our need to call agent.process explicitly
-    }
-  )
+  agent.on("keyPress", () => {
+    return concat(
+      after(inactivityInterval, { type: "Timeout.warn" }),
+      after(warningInterval, { type: "Timeout.logout" })
+    )
+  }, {
+    concurrency: "cutoff", // If a timeout exists when we're triggered, replace it with this new one
+    processResults: true // Obviates our need to call agent.process explicitly
+  })
 
   // Greet the user and kick something off to begin our initial timeout
   log("Your session will timeout in 5 seconds. Keep pressing keys to keep it alive", config)

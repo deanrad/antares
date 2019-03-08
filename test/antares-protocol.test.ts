@@ -20,13 +20,6 @@ let callCount = 0
 let blowupCount = 0
 let counter = 0
 
-// Synchronously uppdates our resettable counter.
-// Returns immediately completed observable
-const callCounter: Subscriber = ({ action }) => {
-  ++callCount
-  return empty()
-}
-
 // Returns next-callstack completed observable
 const deferredCallCounter: Subscriber = ({ action }) => {
   return new Observable(notify => {
@@ -334,17 +327,14 @@ describe("Agent", () => {
         describe("processResults", () => {
           it("should enable returned actions from renderer to go through agent.process", () => {
             expect.assertions(1)
-            agent.addRenderer(
-              ({ action }) => {
-                if (action.type === "addTwo") {
-                  counter += 2
-                  return empty()
-                }
-                counter += 1
-                return of({ type: "addTwo" })
-              },
-              { processResults: true }
-            )
+            agent.addRenderer(({ action }) => {
+              if (action.type === "addTwo") {
+                counter += 2
+                return empty()
+              }
+              counter += 1
+              return of({ type: "addTwo" })
+            }, { processResults: true })
 
             // since this render returns another action, we'll get two calls
             agent.process({ type: "addOne" })
@@ -364,14 +354,10 @@ describe("Agent", () => {
             expect.assertions(1)
 
             const ctx = { i: 1 }
-            agent.on(
-              "add",
-              ({ action }) => {
-                // agent.process({ type: "times", payload: 2.1 }, ctx)
-                return of({ type: "times", payload: 2.1 })
-              },
-              { processResults: true, withContext: true }
-            )
+            agent.on("add", ({ action }) => {
+              // agent.process({ type: "times", payload: 2.1 }, ctx)
+              return of({ type: "times", payload: 2.1 })
+            }, { processResults: true, withContext: true })
 
             agent.on("times", ({ action, context }) => {
               expect(context).toEqual(ctx)
@@ -455,13 +441,10 @@ describe("Agent", () => {
       it("May be an object ", done => {
         expect.assertions(1)
         const contextObj = { foo: "bar" } // an object such as an express request, which a renderer may do work upon
-        agent.on(
-          () => true,
-          ({ context }) => {
-            expect(context).toBe(contextObj)
-            done()
-          }
-        )
+        agent.on(() => true, ({ context }) => {
+          expect(context).toBe(contextObj)
+          done()
+        })
         agent.process(anyAction, contextObj)
       })
     })
@@ -535,8 +518,7 @@ describe("Agent", () => {
         agent.on("inc", () =>
           after(0, () => {
             ++timesCalled
-          })
-        )
+          }))
         const result = agent.process({ type: "inc" })
 
         // expect same object is returned each time property is referenced
@@ -889,11 +871,8 @@ describe("Agent", () => {
         it("should be passed along to all calls to #process", () => {
           const contextualRenderings = []
           const o = from([{ type: "A" }, { type: "B" }])
-          agent.on(
-            () => true,
-            ({ action, context }) =>
-              contextualRenderings.push({ type: action.type, payload: context })
-          )
+          agent.on(() => true, ({ action, context }) =>
+            contextualRenderings.push({ type: action.type, payload: context }))
           agent.subscribe(o, {
             context: { client: 123 }
           })

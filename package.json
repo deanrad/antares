@@ -103,8 +103,7 @@
       }
     }
   },
-  "dependencies": {
-  },
+  "dependencies": {},
   "peerDependencies": {
     "rxjs": ">=6.1.0"
   },
@@ -124,7 +123,7 @@
     "keypress": "^0.2.1",
     "lint-staged": "^8.1.0",
     "oboe": "^2.1.4",
-    "prettier": "^1.4.4",
+    "prettier": "github:deanius/prettier",
     "prompt": "^1.0.0",
     "redux": "^4.0.0",
     "replace-in-file": "^3.0.0-beta.2",
