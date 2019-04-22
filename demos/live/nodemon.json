@@ -2,5 +2,6 @@
   "events": {
     "start": ": > ../scratch/live-actors.yml",
     "restart": ": > ../scratch/live-actors.yml"
-  }
+  },
+  "watch": ["peeps.txt", "grep.js", "02-grep.js"]
 }
