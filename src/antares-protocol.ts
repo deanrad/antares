@@ -35,7 +35,6 @@ export {
   ActionStreamItem,
   Concurrency,
   ProcessResult,
-  RendererPromiser,
   Subscriber,
   SubscriberConfig
 } from "./types"
@@ -54,7 +53,7 @@ export { startWith, last, filter, delay, map, mapTo, scan } from "rxjs/operators
  */
 export class Agent implements ActionProcessor {
   public static configurableProps = ["agentId", "relayActions"]
-  public static VERSION = "3.1.3"
+  public static VERSION = "3.3.1"
 
   /**
    * The heart and circulatory system of an Agent is `action$`, its action stream. */
@@ -246,7 +245,7 @@ export class Agent implements ActionProcessor {
     const predicate = config.actionsOfType ? getActionFilter(config.actionsOfType) : () => true
     const _filter: Subscriber = (asi: ActionStreamItem) => {
       if (predicate(asi)) {
-        return filter(asi)
+        return filter(asi, asi.action.payload)
       }
     }
 
@@ -293,7 +292,9 @@ export class Agent implements ActionProcessor {
 
       // 1. Get the Observable aka recipe back from the renderer
       try {
-        recipe = toObservable(follower({ action, context }))
+        const actionStreamItem = { action, context, event: action }
+        const followerReturnValue = follower(actionStreamItem, action.payload)
+        recipe = toObservable(followerReturnValue)
       } catch (ex) {
         reportFail(ex)
         // will warn of unhandled rejection error if completed and completed.bad are not handled
@@ -498,6 +499,7 @@ export const pp = (action: Action) => JSON.stringify(action)
 
 /** An agent instance with no special options - good enough for most purposes */
 export const agent = new Agent()
+export const $ = agent
 
 /** Controls what types can be returned from an `on` handler:
     Primitive types: `of()`

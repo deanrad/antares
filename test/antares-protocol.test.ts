@@ -951,7 +951,7 @@ describe("Utilities", () => {
     })
   })
 
-  describe("ajaxStreamingGet (test requires https://jsonplaceholder.typicode.com)", () => {
+  describe.skip("ajaxStreamingGet (test requires https://jsonplaceholder.typicode.com)", () => {
     it("should create an observable of many from an array ajax response", () => {
       jest.setTimeout(10000)
       expect.assertions(1)
