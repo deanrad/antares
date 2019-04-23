@@ -12,7 +12,8 @@ import {
   AgentConfig,
   toProps,
   ajaxStreamingGet,
-  randomId
+  randomId,
+  DerivedStream
 } from "../src/antares-protocol"
 
 let seen: Array<Action> = []
@@ -882,6 +883,38 @@ describe("Agent", () => {
           ])
         })
       })
+    })
+  })
+})
+
+describe("DerivedStream", () => {
+  let agent: Agent
+
+  beforeEach(() => {
+    agent = new Agent()
+  })
+
+  describe("Constructor", () => {
+    it("should return an object that can be sub/unsubscribed", () => {
+      let _count = 0
+      const derived = new DerivedStream(agent, /./, () => _count++, {})
+      const result = agent.process(anyAction)
+      return result.completed
+        .then(() => {
+          expect(_count).toEqual(0)
+        })
+        .then(() => {
+          derived.subscribe()
+          return agent.process(anyAction).completed
+        })
+        .then(() => {
+          expect(_count).toEqual(1)
+          derived.unsubscribe()
+          return agent.process(anyAction).completed
+        })
+        .then(() => {
+          expect(_count).toEqual(1)
+        })
     })
   })
 })

@@ -53,7 +53,7 @@ export { startWith, last, filter, delay, map, mapTo, scan } from "rxjs/operators
  */
 export class Agent implements ActionProcessor {
   public static configurableProps = ["agentId", "relayActions"]
-  public static VERSION = "3.3.1"
+  public static VERSION = "3.3.2"
 
   /**
    * The heart and circulatory system of an Agent is `action$`, its action stream. */
@@ -500,6 +500,35 @@ export const pp = (action: Action) => JSON.stringify(action)
 /** An agent instance with no special options - good enough for most purposes */
 export const agent = new Agent()
 export const $ = agent
+
+/** Like calling agent.on(filter, handler, config), but in an OOP style.
+ * Intended to be used in components that add listeners when they mount
+ * and need to unregister them when they are unmounted, this passes arguments
+ * through to agent.on, and returns the Subscription handle for the stream.
+ *
+ * The derived stream must be started via subscribe(), and can be stopped
+ * by calling unsubscribe() on the subscription returned from subscribe(),
+ * or the Derived stream itself
+ */
+export class DerivedStream {
+  private _subs?: Subscription
+
+  constructor(
+    readonly agent: Agent,
+    readonly filter: ActionFilter,
+    readonly handler: Renderer,
+    readonly config?: SubscriberConfig
+  ) {}
+
+  subscribe() {
+    const { agent, filter, handler, config } = this
+    this._subs = agent.on(filter, handler, config)
+  }
+
+  unsubscribe() {
+    this._subs && this._subs.unsubscribe()
+  }
+}
 
 /** Controls what types can be returned from an `on` handler:
     Primitive types: `of()`
