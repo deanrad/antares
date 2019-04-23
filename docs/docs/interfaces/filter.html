@@ -915,6 +915,9 @@ img { max-width: 100%; }
 		<li class=" tsd-kind-class">
 			<a href="../classes/agent.html" class="tsd-kind-icon">Agent</a>
 		</li>
+		<li class=" tsd-kind-class">
+			<a href="../classes/derivedstream.html" class="tsd-kind-icon">Derived<wbr>Stream</a>
+		</li>
 		<li class=" tsd-kind-interface">
 			<a href="action.html" class="tsd-kind-icon">Action</a>
 		</li>
@@ -956,6 +959,9 @@ img { max-width: 100%; }
 		</li>
 		<li class=" tsd-kind-type-alias">
 			<a href="../globals.html#subscriber" class="tsd-kind-icon">Subscriber</a>
+		</li>
+		<li class=" tsd-kind-variable">
+			<a href="../globals.html#_" class="tsd-kind-icon">$</a>
 		</li>
 		<li class=" tsd-kind-variable">
 			<a href="../globals.html#agent" class="tsd-kind-icon">agent</a>
@@ -1012,6 +1018,23 @@ img { max-width: 100%; }
 </nav>
 <div class="container container-main">
 	<div class="content-wrap">
+		<section class="tsd-panel tsd-comment">
+			<div class="tsd-comment tsd-typography">
+				<div class="lead">
+					<p>A Filter runs a synchronous function prior to any renderers
+						being invoked, and can cancel future filters, and all handlers
+						by throwing an exception, which must be caught by the caller of
+					<code>process(action)</code>.</p>
+				</div>
+				<p>It does <em>not</em>, as its name suggest, split off a slice of the
+				stream. To do that see <code>actionsOfType</code>.</p>
+				<dl class="tsd-comment-tags">
+					<dt>see</dt>
+					<dd><p>actionsOfType</p>
+					</dd>
+				</dl>
+			</div>
+		</section>
 		<section class="tsd-panel tsd-hierarchy">
 			<h3>Hierarchy</h3>
 			<ul class="tsd-hierarchy">
@@ -1023,19 +1046,32 @@ img { max-width: 100%; }
 		<section class="tsd-panel">
 			<h3 class="tsd-before-signature">Callable</h3>
 			<ul class="tsd-signatures tsd-kind-interface">
-				<li class="tsd-signature tsd-kind-icon">__call<span class="tsd-signature-symbol">(</span>item<span class="tsd-signature-symbol">: </span><a href="actionstreamitem.html" class="tsd-signature-type">ActionStreamItem</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span></li>
+				<li class="tsd-signature tsd-kind-icon">__call<span class="tsd-signature-symbol">(</span>item<span class="tsd-signature-symbol">: </span><a href="actionstreamitem.html" class="tsd-signature-type">ActionStreamItem</a>, payload<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span></li>
 			</ul>
 			<ul class="tsd-descriptions">
 				<li class="tsd-description">
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/deanius/antares/blob/9058244/src/types.ts#L79">types.ts:79</a></li>
+							<li>Defined in <a href="https://github.com/deanius/antares/blob/1517be3/src/types.ts#L105">types.ts:105</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>A Filter runs a synchronous function prior to any renderers
+								being invoked, and can cancel future filters, and all handlers
+								by throwing an exception, which must be caught by the caller of
+							<code>process(action)</code>.</p>
+						</div>
+						<p>It does <em>not</em>, as its name suggest, split off a slice of the
+						stream. To do that see <code>actionsOfType</code>.</p>
+					</div>
 					<h4 class="tsd-parameters-title">Parameters</h4>
 					<ul class="tsd-parameters">
 						<li>
 							<h5>item: <a href="actionstreamitem.html" class="tsd-signature-type">ActionStreamItem</a></h5>
+						</li>
+						<li>
+							<h5><span class="tsd-flag ts-flagOptional">Optional</span> payload: <span class="tsd-signature-type">any</span></h5>
 						</li>
 					</ul>
 					<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">any</span></h4>

@@ -1045,10 +1045,13 @@ img { max-width: 100%; }
 			<div class="tsd-comment tsd-typography">
 				<div class="lead">
 					<p>Like calling agent.on(filter, handler, config), but in an OOP style.
-						The derived stream must be started via subscribe(), and can be stopped
-						by calling unsubscribe() on the subscription returned from subscribe(),
-					or the Derived stream itself</p>
+						Intended to be used in components that add listeners when they mount
+						and need to unregister them when they are unmounted, this passes arguments
+					through to agent.on, and returns the Subscription handle for the stream.</p>
 				</div>
+				<p>The derived stream must be started via subscribe(), and can be stopped
+					by calling unsubscribe() on the subscription returned from subscribe(),
+				or the Derived stream itself</p>
 			</div>
 		</section>
 		<section class="tsd-panel tsd-hierarchy">
@@ -1100,7 +1103,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/deanius/antares/blob/d88ea8e/src/antares-protocol.ts#L510">antares-protocol.ts:510</a></li>
+								<li>Defined in <a href="https://github.com/deanius/antares/blob/1517be3/src/antares-protocol.ts#L514">antares-protocol.ts:514</a></li>
 							</ul>
 						</aside>
 						<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1131,7 +1134,7 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">agent<span class="tsd-signature-symbol">:</span> <a href="agent.html" class="tsd-signature-type">Agent</a></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/deanius/antares/blob/d88ea8e/src/antares-protocol.ts#L513">antares-protocol.ts:513</a></li>
+						<li>Defined in <a href="https://github.com/deanius/antares/blob/1517be3/src/antares-protocol.ts#L517">antares-protocol.ts:517</a></li>
 					</ul>
 				</aside>
 			</section>
@@ -1141,7 +1144,7 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">config<span class="tsd-signature-symbol">:</span> <a href="../interfaces/subscriberconfig.html" class="tsd-signature-type">SubscriberConfig</a></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/deanius/antares/blob/d88ea8e/src/antares-protocol.ts#L516">antares-protocol.ts:516</a></li>
+						<li>Defined in <a href="https://github.com/deanius/antares/blob/1517be3/src/antares-protocol.ts#L520">antares-protocol.ts:520</a></li>
 					</ul>
 				</aside>
 			</section>
@@ -1151,7 +1154,7 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">filter<span class="tsd-signature-symbol">:</span> <a href="../globals.html#actionfilter" class="tsd-signature-type">ActionFilter</a></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/deanius/antares/blob/d88ea8e/src/antares-protocol.ts#L514">antares-protocol.ts:514</a></li>
+						<li>Defined in <a href="https://github.com/deanius/antares/blob/1517be3/src/antares-protocol.ts#L518">antares-protocol.ts:518</a></li>
 					</ul>
 				</aside>
 			</section>
@@ -1161,7 +1164,7 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">handler<span class="tsd-signature-symbol">:</span> <a href="../interfaces/renderer.html" class="tsd-signature-type">Renderer</a></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/deanius/antares/blob/d88ea8e/src/antares-protocol.ts#L515">antares-protocol.ts:515</a></li>
+						<li>Defined in <a href="https://github.com/deanius/antares/blob/1517be3/src/antares-protocol.ts#L519">antares-protocol.ts:519</a></li>
 					</ul>
 				</aside>
 			</section>
@@ -1178,7 +1181,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/deanius/antares/blob/d88ea8e/src/antares-protocol.ts#L519">antares-protocol.ts:519</a></li>
+								<li>Defined in <a href="https://github.com/deanius/antares/blob/1517be3/src/antares-protocol.ts#L523">antares-protocol.ts:523</a></li>
 							</ul>
 						</aside>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -1195,7 +1198,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/deanius/antares/blob/d88ea8e/src/antares-protocol.ts#L524">antares-protocol.ts:524</a></li>
+								<li>Defined in <a href="https://github.com/deanius/antares/blob/1517be3/src/antares-protocol.ts#L528">antares-protocol.ts:528</a></li>
 							</ul>
 						</aside>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
