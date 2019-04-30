@@ -1,7 +1,7 @@
 {
   "events": {
-    "start": ": > ../scratch/live-actors.yml",
-    "restart": ": > ../scratch/live-actors.yml"
+    "start": ": > ../scratch/live-actors.yml; : > synergy.stderr",
+    "restart": ": > ../scratch/live-actors.yml; : > synergy.stderr"
   },
-  "watch": ["peeps.txt", "grep.js", "02-grep.js"]
+  "watch": ["03-filter-advice.js", "consultant-svc.js", "peeps.txt", "grep.js", "02-grep.js"]
 }

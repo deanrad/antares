@@ -4,7 +4,12 @@
   "description": "",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "grep": "cat peeps.txt | node grep.js o > grep.stdout 2> grep.stderr",
+    "grep": "code grep.stdout grep.stderr; cat peeps.txt | node grep.js o > grep.stdout 2> grep.stderr",
+    "watch1": "watch -n 1 cat grep.stdout",
+    "watch2": "watch -n 1 cat grep.stderr",
+    "synergy:run": "node 03-filter-advice.js 'l' 2> synergy.stderr",
+    "synergy:ps": "osascript scripts/synergy-ps.scpt",
+    "synergy:watch": "echo > synergy.stderr; osascript scripts/synergy-watch.scpt",
     "start": "npm run grep"
   },
   "keywords": [],
@@ -13,6 +18,7 @@
   "devDependencies": {},
   "dependencies": {
     "antares-protocol": "^3.3.0",
+    "faker": "^4.1.0",
     "rxjs": "^6.3.3",
     "rxjs-compat": "^6.3.3",
     "say": "^0.15.0"

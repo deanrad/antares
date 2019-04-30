@@ -11,8 +11,8 @@ events.filter("match", stdOutPrinter)
 
 // Upon events of type "line", trigger a "match" if we're matching the pattern
 // 1. Imperatively invoking
-events.on("line", ({ event }) => {
-  const line = event.payload
+events.on("line", ({ action }) => {
+  const line = action.payload
   if (_pattern.test(line)) {
     events.trigger("match", line)
   }

@@ -8,10 +8,10 @@ const lineReader = readline.createInterface({
 
 //--------- Consequence-Enacters (Renderers) -------//
 function stdErrLogger({ action }) {
-  process.stderr.write(`${action.type}: ${action.payload}\n`)
+  process.stderr.write(`${action.type}: ${action.payload}`)
 }
 function stdOutPrinter({ action }) {
-  process.stdout.write(`${action.payload}\n`)
+  process.stdout.write(`${action.payload}`)
 }
 
 const stdinObservable = fromEvent(lineReader, "line")
